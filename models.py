@@ -21,7 +21,8 @@ class Automata:
         queue.put(self.initial)
         while not queue.empty():
             node = queue.get()
-            if len(node.transitions):
-                pass
-            for transition in node.transitions:
-                pass
+            for key, nodes in node.transitions.iteritems():
+                if len(nodes) > 1:
+                    return False
+                queue.put(nodes[0])
+        return True
