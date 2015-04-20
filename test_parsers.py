@@ -2,8 +2,26 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from parsers import regex_to_automata
+from parsers import regex_to_automata, load_automata
 from models import LAMBDA
+
+
+class TestParseAutomata(TestCase):
+
+    def test_automata_enunciado(self):
+        input_text = 'q0\tq1\tq2\n'
+        input_text += 'a\tb\tc\td\te\tf\n'
+        input_text += 'q0\n'
+        input_text += 'q1\tq2\n'
+        input_text += 'q0\ta\tq1\n'
+        input_text += 'q1\tb\tq2\n'
+        input_text += 'q1\tc\tq1\n'
+        input_text += 'q2\tf\tq2'
+
+        file_input = StringIO(input_text)
+
+        result = load_automata(file_input)
+        self.assertEquals(result.symbols(), set(['a', 'b', 'c', 'd', 'e', 'f']))
 
 
 class TestParseRegex(TestCase):

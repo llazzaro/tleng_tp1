@@ -3,25 +3,30 @@ from collections import defaultdict
 
 
 def load_automata(automata_file):
-    res = Automata()
+    states = set()
     for index, line in enumerate(automata_file.readlines()):
         if index == 0:
             for state_name in line.split('\t'):
-                state = Node(name=state_name)
-                res.add_state(state)
+                state = Node(name=state_name.strip('\n'))
+                states.add(state)
         if index == 1:
+            symbols = set()
             for symbol in line.split('\t'):
-                res.add_symbol(symbol)
+                symbols.add(symbol.strip('\n'))
         if index == 2:
-            res.initial = line.strip('\n')
+            initial = line.strip('\n')
         if index == 3:
+            finals = set()
             for final_state_name in line.split('\t'):
-                res.set_final_state(final_state_name)
+                for state in states:
+                    if state.name == final_state_name:
+                        finals.add(state)
         if index > 4:
+            res = Automata(initial, finals, symbols, states)
             # transitions
             state_1, symbol, state_2 = line.split('\t')
             node_1 = res.state_by_name(state_1)
-            node_2 = res.state_by_name(state_2)
+            node_2 = res.state_by_name(state_2.strip('\n'))
             node_1.add_transition(symbol, node_2)
     return res
 
