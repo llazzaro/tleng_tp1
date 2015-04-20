@@ -36,6 +36,21 @@ class TestParseRegex(TestCase):
         result = regex_to_automata(file_input)
         self.assertEquals(result.finals[0], result.initial.transitions[LAMBDA][0].transitions['c'][0].transitions[LAMBDA][0].transitions['b'][0].transitions[LAMBDA][0].transitions['a'][0])
 
+    def test_simple_plus(self):
+        input_regex_tree = '{PLUS}a'
+        file_input = StringIO(input_regex_tree)
+        result = regex_to_automata(file_input)
+
+    def test_simple_star(self):
+        input_regex_tree = '{STAR}a'
+        file_input = StringIO(input_regex_tree)
+        result = regex_to_automata(file_input)
+
+    def test_simple_opt(self):
+        input_regex_tree = '{OPT}a'
+        file_input = StringIO(input_regex_tree)
+        result = regex_to_automata(file_input)
+
     def test_regex_enunciado_1(self):
         pass
 
