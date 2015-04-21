@@ -24,7 +24,31 @@ def lambda_closure(from_states, automata):
 
 
 def minimize(automata):
-    pass
+    P = set(automata.finals, automata.states() - automata.finals)
+    W = set(automata.finals)
+    while not W.empty():
+        X = set()
+        for symbol in automata.symbols():
+            for from_state, transition_symbol, to_state in automata.transitions:
+                if symbol == transition_symbol:
+                    X.add(from_state)
+
+            for Y in P:
+                if not (X.intersection(Y)).empty() and not (Y.difference(X)).empty():
+                    P.add(X.intersection(Y))
+                    P.add(Y.difference(X))
+
+                    if Y in W:
+                        W.add(X.intersection(Y))
+                        W.add(Y.difference(X))
+                        W.remove(Y)
+                    else:
+                        if len(X.intersection(Y)) <= len(Y.difference(X)):
+                            W.append(X.intersection(Y))
+                        else:
+                            W.append(Y.difference(X))
+                P.remove(Y)
+    return P, W
 
 
 def nfa_to_dfa(automata):

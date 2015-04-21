@@ -67,7 +67,15 @@ class Automata:
         return res
 
     def move_sequence(self, input_sequence):
-        raise NotImplementedError
+        try:
+            for sequence_symbol in input_sequence:
+                self.current_state = list(self.current_state.transitions[sequence_symbol])[0]
+
+            return self.current_state in self.finals
+        except KeyError:
+            return False
+        except IndexError:
+            return False
 
     def move(self, symbol):
         raise NotImplementedError

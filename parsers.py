@@ -4,6 +4,7 @@ from collections import defaultdict
 
 def load_automata(automata_file):
     states = set()
+    res = None
     for index, line in enumerate(automata_file.readlines()):
         if index == 0:
             for state_name in line.split('\t'):
@@ -14,14 +15,18 @@ def load_automata(automata_file):
             for symbol in line.split('\t'):
                 symbols.add(symbol.strip('\n'))
         if index == 2:
-            initial = line.strip('\n')
+            initial_name = line.strip('\n')
         if index == 3:
             finals = set()
             for final_state_name in line.split('\t'):
                 for state in states:
-                    if state.name == final_state_name:
+                    if state.name == final_state_name.strip('\n'):
                         finals.add(state)
-        if index > 4:
+        if index >= 4:
+            for state in states:
+                if initial_name == state.name:
+                    initial = state
+                    break
             res = Automata(initial, finals, symbols, states)
             # transitions
             state_1, symbol, state_2 = line.split('\t')
