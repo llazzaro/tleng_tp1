@@ -43,7 +43,7 @@ def build_operand_dict(tree_file):
             tabs, number_of_operands = line.split('{CONCAT}')
             deep = len(tabs)
             res[deep].append(('{CONCAT}', number_of_operands))
-        elif '{START}' in line:
+        elif '{STAR}' in line:
             tabs, _ = line.split('{STAR}')
             deep = len(tabs)
             res[deep].append(('{STAR}', None))
@@ -91,33 +91,40 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
     elif '{STAR}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
-        operand = operand_or_symbol_dict[deep + 1]
-        operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-        operand_automata.final.add_transition(LAMBDA, final)
-        operand_automata.final.add_transition(LAMBDA, operand_automata.initial)
+        for operand in operand_or_symbol_dict[deep + 1]:
+            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
+        for dfa_final in operand_automata.finals:
+            dfa_final.add_transition(LAMBDA, final)
+            dfa_final.add_transition(LAMBDA, operand_automata.initial)
         initial.add_transition(LAMBDA, operand_automata.initial)
-        initial.add_transition(LAMBDA, operand_automata.final)
+        for final in operand_automata.finals:
+            initial.add_transition(LAMBDA, final)
 
         return Automata(initial, set([final]))
     elif '{PLUS}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
-        operand = operand_or_symbol_dict[deep + 1]
-        operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-        operand_automata.final.add_transition(LAMBDA, final)
-        operand_automata.final.add_transition(LAMBDA, operand_automata.initial)
+        for operand in operand_or_symbol_dict[deep + 1]:
+            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
+        for dfa_final in operand_automata.finals:
+            dfa_final.add_transition(LAMBDA, final)
+            initial.add_transition(LAMBDA, dfa_final)
+
         initial.add_transition(LAMBDA, operand_automata.initial)
 
         return Automata(initial, set([final]))
     elif '{OPT}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
-        operand = operand_or_symbol_dict[deep + 1]
-        operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-        operand_automata.final.add_transition(LAMBDA, final)
-        operand_automata.final.add_transition(LAMBDA, initial)
+
+        for operand in operand_or_symbol_dict[deep + 1]:
+            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
+        for dfa_final in operand_automata.finals:
+            dfa_final.add_transition(LAMBDA, final)
+            dfa_final.add_transition(LAMBDA, initial)
         initial.add_transition(LAMBDA, operand_automata.initial)
-        initial.add_transition(LAMBDA, operand_automata.final)
+        for final in operand_automata.finals:
+            initial.add_transition(LAMBDA, final)
 
         return Automata(initial, set([final]))
     elif '{OR}' in current_operand_or_symbol[0]:

@@ -31,47 +31,65 @@ class TestParseRegex(TestCase):
         file_input = StringIO(input_regex_tree)
 
         result = regex_to_automata(file_input)
-        self.assertEquals(result.finals[0], result.initial.transitions['a'][0])
+        self.assertEquals(result.finals.pop(), result.initial.transitions['a'].pop())
 
     def test_simple_or(self):
         input_regex_tree = '{OR}2\n\ta\n\tb'
         file_input = StringIO(input_regex_tree)
 
         result = regex_to_automata(file_input)
+        final = result.finals.pop()
+        node = result.initial.transitions[LAMBDA].pop()
+        node = node.transitions['a'].pop()
+        final_node = node.transitions[LAMBDA].pop()
+        self.assertEquals(final, final_node)
 
-        self.assertEquals(result.finals.pop(), result.initial.transitions[LAMBDA][0].transitions['a'][0].transitions[LAMBDA][0])
-        self.assertEquals(result.finals.pop(), result.initial.transitions[LAMBDA][1].transitions['b'][0].transitions[LAMBDA][0])
+        node = result.initial.transitions[LAMBDA].pop()
+        node = node.transitions['b'].pop()
+        self.assertEquals(final, node.transitions[LAMBDA].pop())
 
     def test_simple_concat(self):
         input_regex_tree = '{CONCAT}2\n\ta\n\tb'
         file_input = StringIO(input_regex_tree)
         result = regex_to_automata(file_input)
-        self.assertEquals(result.finals[0], result.initial.transitions[LAMBDA][0].transitions['a'][0].transitions[LAMBDA][0].transitions['b'][0])
-
         input_regex_tree = '{CONCAT}3\n\tc\n\tb\n\ta'
         file_input = StringIO(input_regex_tree)
 
         result = regex_to_automata(file_input)
-        self.assertEquals(result.finals[0], result.initial.transitions[LAMBDA][0].transitions['c'][0].transitions[LAMBDA][0].transitions['b'][0].transitions[LAMBDA][0].transitions['a'][0])
+        final = result.finals.pop()
+        node = result.initial.transitions[LAMBDA].pop()
+        node = node.transitions['c'].pop()
+        node = node.transitions[LAMBDA].pop()
+        node = node.transitions['b'].pop()
+        node = node.transitions[LAMBDA].pop()
+        self.assertEquals(final, node.transitions['a'].pop())
 
     def test_simple_plus(self):
         input_regex_tree = '{PLUS}\n\ta'
-        import ipdb
-        ipdb.set_trace()
         file_input = StringIO(input_regex_tree)
+
         result = regex_to_automata(file_input)
-        import ipdb
-        ipdb.set_trace()
+        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
+        self.assertEquals(len(result.states()), 4)
+        self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
+        # from_one = result.initial.transitions[LAMBDA].pop()
+
+        # from_two = result.initial.transitions[LAMBDA].pop()
 
     def test_simple_star(self):
-        input_regex_tree = '{STAR}a'
+        input_regex_tree = '{STAR}\n\ta'
+        file_input = StringIO(input_regex_tree)
+        result = regex_to_automata(file_input)
+        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
+        self.assertEquals(len(result.states()), 4)
+        self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
+
+    def test_simple_opt(self):
+        input_regex_tree = '{OPT}\n\ta'
         file_input = StringIO(input_regex_tree)
         result = regex_to_automata(file_input)
 
-    def test_simple_opt(self):
-        input_regex_tree = '{OPT}a'
-        file_input = StringIO(input_regex_tree)
-        result = regex_to_automata(file_input)
+        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
 
     def test_regex_enunciado_1(self):
         pass
