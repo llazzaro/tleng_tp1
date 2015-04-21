@@ -44,18 +44,17 @@ def build_operand_dict(tree_file):
             deep = len(tabs)
             res[deep].append(('{CONCAT}', number_of_operands))
         elif '{START}' in line:
-            tabs, number_of_operands = line.split('{START}')
+            tabs, _ = line.split('{STAR}')
             deep = len(tabs)
-            res[deep].append(('{START}', number_of_operands))
+            res[deep].append(('{STAR}', None))
         elif '{PLUS}' in line:
-            tabs, number_of_operands = line.split('{PLUS}')
+            tabs, _ = line.split('{PLUS}')
             deep = len(tabs)
-            res[deep].append(('{PLUS}', number_of_operands))
-            pass
+            res[deep].append(('{PLUS}', None))
         elif '{OPT}' in line:
-            tabs, number_of_operands = line.split('{OPT}')
+            tabs, _ = line.split('{OPT}')
             deep = len(tabs)
-            res[deep].append(('{OPT}', number_of_operands))
+            res[deep].append(('{OPT}', None))
         elif '{OR}' in line:
             tabs, number_of_operands = line.split('{OR}')
             deep = len(tabs)
@@ -89,12 +88,38 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
 
         initial.add_transition(LAMBDA, next_node)
         return Automata(initial, finals)
-    elif '{START}' in current_operand_or_symbol[0]:
-        raise NotImplementedError
+    elif '{STAR}' in current_operand_or_symbol[0]:
+        initial = Node()
+        final = Node()
+        operand = operand_or_symbol_dict[deep + 1]
+        operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
+        operand_automata.final.add_transition(LAMBDA, final)
+        operand_automata.final.add_transition(LAMBDA, operand_automata.initial)
+        initial.add_transition(LAMBDA, operand_automata.initial)
+        initial.add_transition(LAMBDA, operand_automata.final)
+
+        return Automata(initial, set([final]))
     elif '{PLUS}' in current_operand_or_symbol[0]:
-        raise NotImplementedError
+        initial = Node()
+        final = Node()
+        operand = operand_or_symbol_dict[deep + 1]
+        operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
+        operand_automata.final.add_transition(LAMBDA, final)
+        operand_automata.final.add_transition(LAMBDA, operand_automata.initial)
+        initial.add_transition(LAMBDA, operand_automata.initial)
+
+        return Automata(initial, set([final]))
     elif '{OPT}' in current_operand_or_symbol[0]:
-        raise NotImplementedError
+        initial = Node()
+        final = Node()
+        operand = operand_or_symbol_dict[deep + 1]
+        operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
+        operand_automata.final.add_transition(LAMBDA, final)
+        operand_automata.final.add_transition(LAMBDA, initial)
+        initial.add_transition(LAMBDA, operand_automata.initial)
+        initial.add_transition(LAMBDA, operand_automata.final)
+
+        return Automata(initial, set([final]))
     elif '{OR}' in current_operand_or_symbol[0]:
         initial = Node()
         new_final = Node()

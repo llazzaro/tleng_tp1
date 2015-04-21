@@ -39,8 +39,8 @@ class TestParseRegex(TestCase):
 
         result = regex_to_automata(file_input)
 
-        self.assertEquals(result.finals[0], result.initial.transitions[LAMBDA][0].transitions['a'][0].transitions[LAMBDA][0])
-        self.assertEquals(result.finals[0], result.initial.transitions[LAMBDA][1].transitions['b'][0].transitions[LAMBDA][0])
+        self.assertEquals(result.finals.pop(), result.initial.transitions[LAMBDA][0].transitions['a'][0].transitions[LAMBDA][0])
+        self.assertEquals(result.finals.pop(), result.initial.transitions[LAMBDA][1].transitions['b'][0].transitions[LAMBDA][0])
 
     def test_simple_concat(self):
         input_regex_tree = '{CONCAT}2\n\ta\n\tb'
@@ -55,9 +55,13 @@ class TestParseRegex(TestCase):
         self.assertEquals(result.finals[0], result.initial.transitions[LAMBDA][0].transitions['c'][0].transitions[LAMBDA][0].transitions['b'][0].transitions[LAMBDA][0].transitions['a'][0])
 
     def test_simple_plus(self):
-        input_regex_tree = '{PLUS}a'
+        input_regex_tree = '{PLUS}\n\ta'
+        import ipdb
+        ipdb.set_trace()
         file_input = StringIO(input_regex_tree)
         result = regex_to_automata(file_input)
+        import ipdb
+        ipdb.set_trace()
 
     def test_simple_star(self):
         input_regex_tree = '{STAR}a'

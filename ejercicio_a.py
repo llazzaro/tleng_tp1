@@ -4,37 +4,7 @@
 from Queue import Queue
 from models import Automata, FromNFANode, LAMBDA
 from parsers import regex_to_automata
-
-
-def save_automata(automata, automata_file):
-    states = ''
-    for index, state in enumerate(automata.states()):
-        states +='{0}'.format(state.name)
-        if index > 0:
-            states +='\t'
-    automata_file.write(states + '\n')
-
-    symbols = ''
-    for symbol in automata.symbols():
-        symbols += '{0}'.format(symbol)
-
-    automata_file.write(symbols + '\n')
-
-    automata_file.write(automata.initial.name + '\n')
-
-    finals_out = ''
-    for index, final_state in enumerate(automata.finals):
-        finals_out += '{0}'.format(final_state.name)
-        if index > 0:
-            finals_out += '\t'
-
-    transitions_out = ''
-    for state in automata.states():
-        for symbol, nodes in state.transitions:
-            for node in nodes:
-                transitions_out += '{0}\t{1}\t{2}\n'.format(state.name, symbol, node.name)
-
-    automata_file.write(transitions_out)
+from writers import save_automata
 
 
 def lambda_closure(from_states, automata):

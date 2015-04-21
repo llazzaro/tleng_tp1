@@ -67,6 +67,9 @@ class Automata:
     def symbols(self):
         return self._symbols
 
+    def delta(self):
+        raise NotImplementedError
+
     def add_symbol(self, symbol):
         self._symbols.add(symbol)
 
