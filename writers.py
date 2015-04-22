@@ -47,8 +47,10 @@ def save_automata(automata, automata_file):
 
     transitions_out = ''
     for state in automata.states():
-        for symbol, nodes in state.transitions:
-            for node in nodes:
+        #for symbol, nodes in state.transitions:
+        #    for node in nodes:
+        for symbol in state.transitions:
+            for node in state.transitions[symbol]:
                 transitions_out += '{0}\t{1}\t{2}\n'.format(state.name, symbol, node.name)
 
     automata_file.write(transitions_out)
