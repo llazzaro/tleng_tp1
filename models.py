@@ -18,6 +18,9 @@ class Node:
     def add_transition(self, symbol, state):
         self.transitions[symbol].add(state)
 
+    def transitions(self):
+        return list(self.transitions)
+
     def __eq__(self, other):
         return self.name == other.name
 
