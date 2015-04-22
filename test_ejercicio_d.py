@@ -2,7 +2,7 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from ejercicio_d import interseccion, IncompatibleAlphabetsError
+from ejercicio_d import interseccion, IncompatibleAlphabetsError, NonDeterministicAutomataError
 
 class TestEjercicioD(TestCase):
 
@@ -52,6 +52,32 @@ class TestEjercicioD(TestCase):
         file_output = StringIO()
         with self.assertRaises(IncompatibleAlphabetsError):
             interseccion(file_input1, file_input2, file_output)
+
+    def test_no_determinismo(self):
+        input_automata1 = 'q0\tq1\n'
+        input_automata1 += '0\t1\n'
+        input_automata1 += 'q0\n'
+        input_automata1 += 'q1\n'
+        input_automata1 += 'q0\t0\tq1\n'
+        input_automata1 += 'q0\t1\tq1\n'
+        input_automata1 += 'q1\t0\tq0\n'
+        input_automata1 += 'q1\t0\tq1\n'
+        input_automata1 += 'q1\t1\tq1\n'
+
+        input_automata2 = 'q0\tq1\n'
+        input_automata2 += '0\t1\n'
+        input_automata2 += 'q0\n'
+        input_automata2 += 'q1\n'
+        input_automata2 += 'q0\t0\tq1\n'
+        input_automata2 += 'q0\t1\tq1\n'
+        input_automata2 += 'q1\t0\tq0\n'
+
+        file_input1 = StringIO(input_automata1)
+        file_input2 = StringIO(input_automata2)
+        file_output = StringIO()
+        with self.assertRaises(NonDeterministicAutomataError):
+            interseccion(file_input1, file_input2, file_output)
+
 
 
 if __name__ == '__main__':
