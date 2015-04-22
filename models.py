@@ -18,8 +18,11 @@ class Node:
     def add_transition(self, symbol, state):
         self.transitions[symbol].add(state)
 
-    def transitions(self):
-        return list(self.transitions)
+    def transition(self, symbol):
+        if not self.is_deterministic():
+            raise Exception('Este metodo solo esta disponible solo para DFA')
+        for state in self.transitions[symbol]:
+            return state
 
     def __eq__(self, other):
         return self.name == other.name
