@@ -2,7 +2,7 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from ejercicio_d import interseccion
+from ejercicio_d import interseccion, IncompatibleAlphabetsError
 
 class TestEjercicioD(TestCase):
 
@@ -50,9 +50,9 @@ class TestEjercicioD(TestCase):
         file_input1 = StringIO(input_automata1)
         file_input2 = StringIO(input_automata2)
         file_output = StringIO()
-        interseccion(file_input1, file_input2, file_output)
+        with self.assertRaises(IncompatibleAlphabetsError):
+            interseccion(file_input1, file_input2, file_output)
 
-        #Expected exception.
 
 if __name__ == '__main__':
     unittest.main()
