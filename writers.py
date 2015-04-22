@@ -1,10 +1,12 @@
 
 def save_dot(automata, dot_file):
     dot_file.write('digraph automata {')
-    dot_file.write('"" [shape=none]')
+    dot_file.write('rankdir=LR;')
     for state in automata.states():
-        if state in automata.finals:
-            dot_file.write('"{0}" [shape=circle]'.format(state.name))
+        if state == automata.initial:
+            dot_file.write('node [shape = none, label = "", width = 0, height = 0]; {0}'.format(state.name))
+        elif state in automata.finals:
+            dot_file.write('"{0}" [shape = doublecircle]'.format(state.name))
         else:
             dot_file.write('"{0}" [shape=none]'.format(state.name))
     dot_file.write('"" -> "{0}"'.format(automata.initial.name))
