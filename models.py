@@ -19,8 +19,6 @@ class Node:
         self.transitions[symbol].add(state)
 
     def transition(self, symbol):
-        if not self.is_deterministic():
-            raise Exception('Este metodo solo esta disponible solo para DFA')
         for state in self.transitions[symbol]:
             return state
 
