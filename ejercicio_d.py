@@ -13,9 +13,6 @@ class IncompatibleAlphabetsError(Exception):
 class NonDeterministicAutomataError(Exception):
 	pass
 
-def getElementFromSet(A):
-	return A.copy().pop()
-
 def interseccion(archivo_automata1, archivo_automata2, archivo_automata):
 	automata1 = load_automata(archivo_automata1)
 	automata2 = load_automata(archivo_automata2)
