@@ -27,5 +27,7 @@ class TestModels(TestCase):
         automata=Automata(initial, final)
         self.assertTrue(automata.is_deterministic())
 
+        self.assertEquals(initial.transition('a'), final)
+
 if __name__ == '__main__':
     unittest.main()
