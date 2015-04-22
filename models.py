@@ -105,15 +105,10 @@ class Automata:
         raise ValueError('State not found')
 
     def is_deterministic(self):
-        queue = Queue()
-        queue.put(self.initial)
-        while not queue.empty():
-            node = queue.get()
-            for key, nodes in node.transitions.iteritems():
-                if len(nodes) > 1:
+        for state in self._states:
+            for key, to_states in state.transitions.iteritems():
+                if len(to_states) > 1:
                     return False
-                for node in nodes:
-                    queue.put(node)
         return True
 
     def set_final_state(self, state_name):
