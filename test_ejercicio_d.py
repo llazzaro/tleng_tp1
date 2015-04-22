@@ -27,8 +27,8 @@ class TestEjercicioD(TestCase):
         expected += '(q0,q0)\t1\t(q1,q1)\n'
         expected += '(q1,q1)\t0\t(q0,q0)\n'
 
-        import ipdb
-        ipdb.set_trace()
+        #import ipdb
+        #ipdb.set_trace()
 
     def test_alfabetos_disjuntos(self):
         input_automata1 = 'q0\tq1\n'
