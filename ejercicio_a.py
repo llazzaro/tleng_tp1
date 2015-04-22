@@ -24,6 +24,10 @@ def lambda_closure(from_states, automata):
     return res
 
 
+def add_terminal_node(automata):
+    raise NotImplementedError
+
+
 def minimize(automata):
     add_terminal_node(automata)
     current_partition = {}
