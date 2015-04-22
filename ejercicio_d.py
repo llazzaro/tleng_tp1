@@ -24,15 +24,8 @@ def afd_interseccion(automata1, automata2):
 	if automata1.symbols() != automata2.symbols():
 		raise IncompatibleAlphabetsError
 
-	for s in automata1.states():
-		for c in automata1.symbols():
-			if len(s.transitions[c]) > 1:
-				raise NonDeterministicAutomataError
-
-	for s in automata2.states():
-		for c in automata2.symbols():
-			if len(s.transitions[c]) > 1:
-				raise NonDeterministicAutomataError
+	if not (automata1.is_deterministic() and automata2.is_deterministic()):
+		raise NonDeterministicAutomataError
 
 	symbols = automata1.symbols()
 
