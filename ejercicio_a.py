@@ -2,6 +2,7 @@
 #!/usr/bin/python
 
 from Queue import Queue
+from collections import defaultdict
 from models import Automata, FromNFANode, LAMBDA
 from parsers import regex_to_automata
 from writers import save_automata
@@ -24,31 +25,40 @@ def lambda_closure(from_states, automata):
 
 
 def minimize(automata):
-    P = set(automata.finals, automata.states() - automata.finals)
-    W = set(automata.finals)
-    while not W.empty():
-        X = set()
+    add_terminal_node(automata)
+    current_partition = {}
+    for state in automata.states():
+        if state not in automata.finals:
+            current_partition[state.name] = 1
+        if state in automata.finals:
+            current_partition[state.name] = 2
+
+    previous_partition = None
+    while current_partition != previous_partition:
+        previous_partition = current_partition
+        current_partition = {}
+        labels = defaultdict(dict)
+
+        # previous partitons es equiv_(n-1)
+        # labels refiere a el identificador de la particion
         for symbol in automata.symbols():
-            for from_state, transition_symbol, to_state in automata.transitions:
-                if symbol == transition_symbol:
-                    X.add(from_state)
+            for state in automata.states():
+                labels[state.name][symbol] = previous_partition[state.transition(symbol).name]
 
-            for Y in P:
-                if not (X.intersection(Y)).empty() and not (Y.difference(X)).empty():
-                    P.add(X.intersection(Y))
-                    P.add(Y.difference(X))
+        new_labels = defaultdict(list)
+        for state in automata.states():
+            new_labels[state.name].append(previous_partition[state.name])
+            for symbol in automata.symbols():
+                new_labels[state.name].append(labels[state.name][symbol])
 
-                    if Y in W:
-                        W.add(X.intersection(Y))
-                        W.add(Y.difference(X))
-                        W.remove(Y)
-                    else:
-                        if len(X.intersection(Y)) <= len(Y.difference(X)):
-                            W.append(X.intersection(Y))
-                        else:
-                            W.append(Y.difference(X))
-                P.remove(Y)
-    return P, W
+        # esto para armar los nuevos identificadores
+        # para las nuevas particiones.
+        new_labels_unique = list(set(new_labels.values()))
+        for state in automata.state():
+            current_partition[state.name] = new_labels_unique.index(new_labels[state.name])
+
+    # armo el grafo
+    raise NotImplementedError('Falta armar el grafo')
 
 
 def nfa_to_dfa(automata):
