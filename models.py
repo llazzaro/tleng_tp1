@@ -125,7 +125,7 @@ class Automata:
 class FromNFANode(Node):
 
     def __init__(self, name, nodes):
-        super(FromNFANode, self).__init__()
+        super(FromNFANode, self).__init__(name)
         self.nodes = nodes
 
     def __hash__(self):

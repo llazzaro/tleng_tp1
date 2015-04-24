@@ -99,11 +99,9 @@ def minimize(automata):
 
 
 def nfa_to_dfa(automata):
-    sigma=automata.egdes()
-    res=Automata()
-
-    res.initial=FromNFANode(lambda_closure(set([automata.initial])))
-    unmarked_states=set([res.initial])
+    sigma=automata.symbols()
+    initial=FromNFANode(lambda_closure(set([automata.initial])))
+    unmarked_states=set([initial])
 
     while not unmarked_states.empty():
         node=unmarked_states.pop()

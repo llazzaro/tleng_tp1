@@ -3,10 +3,29 @@ from unittest import TestCase
 from StringIO import StringIO
 
 from models import Node, Automata
-from ejercicio_a import afd_minimo, minimize
+from ejercicio_a import afd_minimo, minimize, nfa_to_dfa
 
 
 class TestEjercicioA(TestCase):
+
+    def test_convert_nfa_to_dfa_from_hopcroft(self):
+        initial = Node(name='q0')
+        state_q1 = Node(name='q1')
+        state_q2 = Node(name='q2')
+
+        initial.add_transition('0', initial)
+        initial.add_transition('1', initial)
+        initial.add_transition('0', state_q1)
+
+        state_q1.add_transition('1', state_q2)
+
+        finals = [state_q2]
+
+        nfa_automata = Automata(initial, finals)
+
+        import ipdb
+        ipdb.set_trace()
+        dfa_automata = nfa_to_dfa(nfa_automata)
 
     def test_minize_example_from_hopcroft(self):
         initial = Node(name='c')
@@ -35,7 +54,7 @@ class TestEjercicioA(TestCase):
         self.assertEquals(minimized.initial.transition('1'), other_node)
         self.assertEquals(minimized.initial.transition('1').transition('1'), other_node)
 
-    def aaatest_minimize_1(self):
+    def test_minimize_1(self):
         input_automata = 'a\tb\tc\td\te\tf\n'
         input_automata += '0\t1\n'
         input_automata += 'a\n'
@@ -64,9 +83,6 @@ class TestEjercicioA(TestCase):
         expected += 'q1\t1\tq2\n'
         expected += 'q2\t0\tq2\n'
         expected += 'q2\t1\tq2\n'
-
-        import ipdb
-        ipdb.set_trace()
 
 if __name__ == '__main__':
     unittest.main()
