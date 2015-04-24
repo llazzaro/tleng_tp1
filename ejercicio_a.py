@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
-#!/usr/bin/python
+#!/usr/bin/env python
 
 from Queue import Queue
 from collections import defaultdict
-from models import Automata, FromNFANode, LAMBDA
+from models import Automata, FromNFANode, LAMBDA, Node
 from parsers import regex_to_automata
 from writers import save_automata
 
@@ -25,11 +25,15 @@ def lambda_closure(from_states, automata):
 
 
 def add_terminal_node(automata):
-    raise NotImplementedError
+    terminal = Node()
+    for state in automata.states():
+        state.add_transition(LAMBDA, terminal)
+
+    return Automata(automata.initial, automata.final)
 
 
 def minimize(automata):
-    add_terminal_node(automata)
+    automata = add_terminal_node(automata)
     current_partition = {}
     for state in automata.states():
         if state not in automata.finals:
@@ -62,7 +66,19 @@ def minimize(automata):
             current_partition[state.name] = new_labels_unique.index(new_labels[state.name])
 
     # armo el grafo
-    raise NotImplementedError('Falta armar el grafo')
+    min_states_by_name = {}
+    for new_label in new_labels_unique:
+        min_states_by_name[new_label] = Node(name='q{0}'.format(new_label))
+
+    for state in automata.states():
+        for symbol in automata.symbols():
+            new_label = current_partition[state.name]
+            to_state = min_states_by_name['q{0}'.format(labels[symbol])]
+            min_states_by_name['q{0}'.format(new_label)].add_transition(symbol, to_state)
+
+    initial = min_states_by_name[new_labels_unique[0]]
+    finals = []
+    return Automata(initial, finals)
 
 
 def nfa_to_dfa(automata):
