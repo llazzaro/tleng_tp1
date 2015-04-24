@@ -85,6 +85,7 @@ class TestEjercicioD(TestCase):
         interseccion(file_input1, file_input2, file_output)
 
 
+        #expected = la cadena "010"
         expected =  '\t'.join(["(q" + str(i) + ",q" + str(i) + ")" for i in range(0, 4)]) + '\n'
         expected += '\t'.join(['0', '1']) + '\n'
         expected += '(q0,q0)' + '\n'
