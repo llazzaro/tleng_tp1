@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 #!/usr/bin/python
 
 import sys
@@ -81,7 +81,7 @@ if __name__ == "__main__":
 
     print "Parametros invalidos."
     print "Uso:"
-    print 
+    print
     print "afd -leng <archivo_regex> -aut <archivo_automata>"
     print "afd -aut <archivo_automata> <cadena>"
     print "afd -aut <archivo_automata> -dot <archivo_dot>"

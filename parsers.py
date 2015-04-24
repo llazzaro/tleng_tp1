@@ -1,8 +1,10 @@
+import sys
+import string
 from models import Automata, Node, LAMBDA
 from collections import defaultdict
 
 
-def load_automata(automata_file):
+def really_load_automata(automata_file):
     states = set()
     res = None
     for index, line in enumerate(automata_file.readlines()):
@@ -35,6 +37,13 @@ def load_automata(automata_file):
             node_1.add_transition(symbol, node_2)
     return res
 
+
+def load_automata(automata_file):
+    try:
+        really_load_automata(automata_file)
+    except:
+        raise Exception('Formato de archivo de automata invalido')
+        sys.exit(1)
 
 def build_operand_dict(tree_file):
     """
@@ -71,9 +80,14 @@ def build_operand_dict(tree_file):
 
 
 def regex_to_automata(tree_file):
-    operand_dict = build_operand_dict(tree_file)
+    try:
+        operand_dict = build_operand_dict(tree_file)
+        res = build_automata(operand_dict[0][0], 0, operand_dict)
+    except:
+        raise Exception('Formato de archivo de regex invalido')
+        sys.exit(1)
 
-    return build_automata(operand_dict[0][0], 0, operand_dict)
+    return res
 
 
 def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
@@ -147,6 +161,7 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         # simbolo alfabeto
         assert current_operand_or_symbol[0] == '{SYMBOL}'
         symbol=current_operand_or_symbol[1]
+        assert symbol in string.letters
         initial=Node()
         final=Node()
         initial.add_transition(symbol, final)
