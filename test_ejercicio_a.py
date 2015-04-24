@@ -2,12 +2,40 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from ejercicio_a import afd_minimo
+from models import Node, Automata
+from ejercicio_a import afd_minimo, minimize
 
 
 class TestEjercicioA(TestCase):
 
-    def test_minimize_1(self):
+    def test_minize_example_from_hopcroft(self):
+        initial = Node(name='c')
+        state_d = Node(name='d')
+        state_e = Node(name='e')
+
+        initial.add_transition('0', state_d)
+        initial.add_transition('1', state_e)
+
+        state_d.add_transition('0', state_d)
+        state_d.add_transition('1', state_e)
+
+        state_e.add_transition('1', state_e)
+        state_e.add_transition('0', initial)
+
+        finals = [initial, state_d]
+
+        not_minimized = Automata(initial, finals)
+
+        minimized = minimize(not_minimized)
+
+        self.assertEquals(len(minimized.states()), 2)
+        self.assertEquals(minimized.initial.transition('0'), minimized.initial)
+        other_node = minimized.initial.transition('1')
+        self.assertEquals(minimized.initial.transition('1').transition('0'), minimized.initial)
+        self.assertEquals(minimized.initial.transition('1'), other_node)
+        self.assertEquals(minimized.initial.transition('1').transition('1'), other_node)
+
+    def aaatest_minimize_1(self):
         input_automata = 'a\tb\tc\td\te\tf\n'
         input_automata += '0\t1\n'
         input_automata += 'a\n'
