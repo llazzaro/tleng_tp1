@@ -4,7 +4,7 @@ from Queue import Queue
 LAMBDA = '@'
 
 
-class Node:
+class Node(object):
 
     NODE_INDEX = 0
 
@@ -124,7 +124,7 @@ class Automata:
 
 class FromNFANode(Node):
 
-    def __init__(self, name, nodes):
+    def __init__(self, nodes, name=None):
         super(FromNFANode, self).__init__(name)
         self.nodes = nodes
 

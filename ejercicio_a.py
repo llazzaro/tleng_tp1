@@ -100,10 +100,10 @@ def minimize(automata):
 
 def nfa_to_dfa(automata):
     sigma=automata.symbols()
-    initial=FromNFANode(lambda_closure(set([automata.initial])))
+    initial=FromNFANode(lambda_closure(set([automata.initial]), automata))
     unmarked_states=set([initial])
 
-    while not unmarked_states.empty():
+    while len(unmarked_states) > 0:
         node=unmarked_states.pop()
         for symbol in sigma:
             state_closure=lambda_closure(set([node]))
