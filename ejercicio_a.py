@@ -3,7 +3,7 @@
 
 from Queue import Queue
 from collections import defaultdict
-from models import Automata, FromNFANode, LAMBDA, Node
+from models import Automata, LAMBDA, Node
 from parsers import regex_to_automata
 from writers import save_automata
 
@@ -13,6 +13,7 @@ def lambda_closure(from_states, automata):
     queue=Queue()
     for state in from_states:
         queue.put(state)
+        res.add(state)
 
     while not queue.empty():
         node=queue.get()
@@ -99,23 +100,34 @@ def minimize(automata):
 
 
 def nfa_to_dfa(automata):
-    sigma=automata.symbols()
-    initial=FromNFANode(lambda_closure(set([automata.initial]), automata))
-    unmarked_states=set([initial])
+    initial = Node(nfa_states=lambda_closure(set([automata.initial]), automata))
+    states_queue = Queue()
+    states_queue.put(initial)
+    used_states = set([initial])
+    # aca construimos el nuevo delta
+    while not states_queue.empty():
+        dfa_state = states_queue.get()
+        for symbol in automata.symbols():
+            state_closure=lambda_closure(automata.move_set(dfa_state.nfa_states, symbol), automata)
 
-    while len(unmarked_states) > 0:
-        node=unmarked_states.pop()
-        for symbol in sigma:
-            state_closure=lambda_closure(set([node]))
-            dfa_candidate_node=FromNFANode(state_closure)
-            if dfa_candidate_node not in res.states():
-                unmarked_states.put(dfa_candidate_node)
-            node.transitions.append(dfa_candidate_node)
+            new_dfa_state=Node(nfa_states=state_closure)
+            new = True
+            for used_state in used_states:
+                if state_closure == used_state.nfa_states:
+                    new_dfa_state = used_state
+                    new = False
+                    break
 
+            if new:
+                states_queue.put(new_dfa_state)
+            dfa_state.add_transition(symbol, new_dfa_state)
+            used_states.add(new_dfa_state)
+
+    res = Automata(initial, [])
     for state in res.states():
         for nfa_state in state.nfa_states:
             if nfa_state in automata.finals:
-                res.finals.append(state)
+                res.finals.add(state)
 
     return res
 

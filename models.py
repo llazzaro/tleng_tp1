@@ -8,10 +8,11 @@ class Node(object):
 
     NODE_INDEX = 0
 
-    def __init__(self, name=None):
+    def __init__(self, name=None, nfa_states=None):
         self.name = name
         if not name:
             self.name = 'q{0}'.format(Node.NODE_INDEX)
+        self.nfa_states = nfa_states
         Node.NODE_INDEX += 1
         self.transitions = defaultdict(set)
 
@@ -23,7 +24,7 @@ class Node(object):
             return state
 
     def __eq__(self, other):
-        return self.name == other.name
+        return self.name == other.name or self.nfa_states == other.nfa_states
 
     def __hash__(self):
         return id(self)
@@ -63,11 +64,17 @@ class Automata:
                         self._states.add(node)
                         queue.put(node)
 
-    def move_set(self, state, symbol):
+    def move_set(self, states, symbol):
+        """
+            dado un conjunto de states y un symbol
+            devuelve los states que son alcanzables por symbol
+        """
         res = set()
-        for edge, nodes in state.transitions:
-            for node in nodes:
-                res.add(node)
+        for state in states:
+            for edge, nodes in state.transitions.iteritems():
+                if symbol == edge:
+                    for node in nodes:
+                        res.add(node)
         return res
 
     def move_sequence(self, input_sequence):
@@ -120,16 +127,3 @@ class Automata:
             if state.name == state_name:
                 self.finals.add(state)
                 return
-
-
-class FromNFANode(Node):
-
-    def __init__(self, nodes, name=None):
-        super(FromNFANode, self).__init__(name)
-        self.nodes = nodes
-
-    def __hash__(self):
-        return id(self)
-
-    def __eq__(self, other):
-        return self.nodes == other.nodes and self.name == other.name

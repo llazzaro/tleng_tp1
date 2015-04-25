@@ -9,6 +9,10 @@ from ejercicio_a import afd_minimo, minimize, nfa_to_dfa
 class TestEjercicioA(TestCase):
 
     def test_convert_nfa_to_dfa_from_hopcroft(self):
+        """
+            el automata corresponde a la figura 2.9 del libro.
+            el resultado es la firgura 2.14 (pagina 63)
+        """
         initial = Node(name='q0')
         state_q1 = Node(name='q1')
         state_q2 = Node(name='q2')
@@ -23,9 +27,26 @@ class TestEjercicioA(TestCase):
 
         nfa_automata = Automata(initial, finals)
 
-        import ipdb
-        ipdb.set_trace()
         dfa_automata = nfa_to_dfa(nfa_automata)
+
+        self.assertEquals(dfa_automata.symbols(), nfa_automata.symbols())
+        self.assertEquals(len(dfa_automata.states()), 3)
+        self.assertTrue(dfa_automata.is_deterministic())
+        dfa_state_q0q1 = dfa_automata.initial.transition('0')
+        dfa_state_q0q2 = dfa_state_q0q1.transition('1')
+
+        self.assertEquals(dfa_automata.initial.transition('1'), dfa_automata.initial)
+        self.assertEquals(dfa_automata.initial.nfa_states, set([initial]))
+        self.assertEquals(dfa_state_q0q1.nfa_states, set([initial, state_q1]))
+        self.assertEquals(dfa_state_q0q2.nfa_states, set([state_q2, initial]))
+
+        self.assertEquals(dfa_state_q0q1.transition('0'), dfa_state_q0q1)
+        self.assertEquals(dfa_state_q0q1.transition('1'), dfa_state_q0q2)
+
+        self.assertEquals(dfa_state_q0q1.transition('1'), dfa_state_q0q2)
+
+        self.assertEquals(dfa_state_q0q2.transition('0'), dfa_state_q0q1)
+        self.assertEquals(dfa_state_q0q2.transition('1'), dfa_automata.initial)
 
     def test_minize_example_from_hopcroft(self):
         initial = Node(name='c')
