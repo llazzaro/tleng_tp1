@@ -48,6 +48,9 @@ class TestEjercicioA(TestCase):
         self.assertEquals(dfa_state_q0q2.transition('0'), dfa_state_q0q1)
         self.assertEquals(dfa_state_q0q2.transition('1'), dfa_automata.initial)
 
+        self.assertTrue(dfa_state_q0q2 in dfa_automata.finals)
+        self.assertEquals(len(dfa_automata.finals), 1)
+
     def test_minize_example_from_hopcroft(self):
         initial = Node(name='c')
         state_d = Node(name='d')
