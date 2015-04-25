@@ -52,6 +52,9 @@ class TestEjercicioA(TestCase):
         self.assertEquals(len(dfa_automata.finals), 1)
 
     def test_minize_example_from_hopcroft(self):
+        """
+            basado en la figura 4.10 del libro
+        """
         initial = Node(name='c')
         state_d = Node(name='d')
         state_e = Node(name='e')

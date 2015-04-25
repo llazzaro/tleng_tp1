@@ -95,7 +95,8 @@ def minimize(automata):
             if state in automata.finals:
                 finals.add(current_new_state)
 
-    initial=min_states_by_name[0]
+    # 0 is the terminal node
+    initial=min_states_by_name[1]
     return Automata(initial, finals)
 
 
