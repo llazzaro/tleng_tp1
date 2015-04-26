@@ -24,7 +24,7 @@ class Node(object):
             return state
 
     def __eq__(self, other):
-        return self.name == other.name or self.nfa_states == other.nfa_states
+        return self.name == other.name or (self.nfa_states and self.nfa_states == other.nfa_states)
 
     def __hash__(self):
         return id(self)
