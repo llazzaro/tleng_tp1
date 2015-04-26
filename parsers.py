@@ -40,10 +40,10 @@ def really_load_automata(automata_file):
 
 def load_automata(automata_file):
     try:
-        really_load_automata(automata_file)
+        return really_load_automata(automata_file)
     except:
         raise Exception('Formato de archivo de automata invalido')
-        sys.exit(1)
+        #sys.exit(1)
 
 def build_operand_dict(tree_file):
     """
