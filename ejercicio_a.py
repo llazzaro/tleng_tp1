@@ -81,7 +81,9 @@ def minimize(automata):
     for new_label in new_labels_unique:
         min_states_by_name[new_labels_unique.index(new_label)]=Node(name='q{0}'.format(new_labels_unique.index(new_label)))
 
+    initial = None
     finals=set()
+
     for state in automata.states():
         for symbol in automata.symbols():
             new_label=current_partition[state.name]
@@ -94,9 +96,11 @@ def minimize(automata):
             current_new_state.add_transition(symbol, to_state)
             if state in automata.finals:
                 finals.add(current_new_state)
+            if state == automata.initial:
+                initial = current_new_state
 
-    # 0 is the terminal node
-    initial=min_states_by_name[1]
+    assert initial is not None
+
     return Automata(initial, finals)
 
 
