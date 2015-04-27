@@ -144,6 +144,8 @@ class Automata:
         if self._states.intersection(self.finals) == set():
             self._states = set()
         else:
+			#FIXME: Y encima esto está de más, porque para cada estado agregás todo lo alcanzable,
+			# así que no debería quedar nada colgado.
             self.prune_dangling_transitions()
 
     def reachable_states(self):
