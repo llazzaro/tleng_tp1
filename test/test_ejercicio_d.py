@@ -20,43 +20,43 @@ class TestEjercicioD(TestCase):
 
         result = afd_interseccion(automata, automata)
 
-        self.assertEquals(automata.symbols(), result.symbols())
-        self.assertEquals(len(result.states()), len(automata.states()))
-        self.assertEquals(result.initial.name, "(" + automata.initial.name + "," + automata.initial.name + ")")
+        self.assertEqual(automata.symbols(), result.symbols())
+        self.assertEqual(len(result.states()), len(automata.states()))
+        self.assertEqual(result.initial.name, "(" + automata.initial.name + "," + automata.initial.name + ")")
+        self.assertEqual(len(result.finals), len(automata.finals))
+        
+        automata_names = set(map(lambda s: s.name, automata.finals))
+        result_names = set(map(lambda s: s.name, result.finals))
+
+        for n in automata_names:
+            self.assertIn("(" + n + "," + n + ")", result_names)
+
+
+    
+    #def test_interseccion_vacia(self):
+        #input_automata1 = '\t'.join(['q0', 'q1']) + '\n'
+        #input_automata1 += '\t'.join(['0', '1']) + '\n'
+        #input_automata1 += 'q0\n'
+        #input_automata1 += 'q1\n'
+        #input_automata1 += '\t'.join(['q0', '0', 'q1']) + '\n'
+        #input_automata1 += '\t'.join(['q0', '1', 'q0']) + '\n'
+
+        #input_automata2 = '\t'.join(['q0', 'q1']) + '\n'
+        #input_automata2 += '\t'.join(['0', '1']) + '\n'
+        #input_automata2 += 'q0\n'
+        #input_automata2 += 'q1\n'
+        #input_automata2 += '\t'.join(['q0', '1', 'q1']) + '\n'
+        #input_automata2 += '\t'.join(['q0', '0', 'q0']) + '\n'
+
+        #automata1 = load_automata(StringIO(input_automata1))
+        #automata2 = load_automat(StringIO(input_automata2))
+
+        #interseccion_vacia = afd_interseccion(automata1, automata2)
 
         #expected =  '\t'.join(['(q0,q0)', '(q1,q1)']) + '\n'
         #expected += '\t'.join(['0', '1']) + '\n'
         #expected += '(q0,q0)\n'
         #expected += '(q1,q1)\n'
-        #expected +=  '\t'.join(['(q0,q0)', '0', '(q1,q1)']) + '\n'
-        #expected +=  '\t'.join(['(q0,q0)', '1', '(q1,q1)']) + '\n'
-        #expected +=  '\t'.join(['(q1,q1)', '0', '(q0,q0)']) + '\n'
-    
-    
-#    def test_interseccion_vacia(self):
-#        input_automata1 = '\t'.join(['q0', 'q1']) + '\n'
-#        input_automata1 += '\t'.join(['0', '1']) + '\n'
-#        input_automata1 += 'q0\n'
-#        input_automata1 += 'q1\n'
-#        input_automata1 += '\t'.join(['q0', '0', 'q1']) + '\n'
-#        input_automata1 += '\t'.join(['q0', '1', 'q0']) + '\n'
-#
-#        input_automata2 = '\t'.join(['q0', 'q1']) + '\n'
-#        input_automata2 += '\t'.join(['0', '1']) + '\n'
-#        input_automata2 += 'q0\n'
-#        input_automata2 += 'q1\n'
-#        input_automata2 += '\t'.join(['q0', '1', 'q1']) + '\n'
-#        input_automata2 += '\t'.join(['q0', '0', 'q0']) + '\n'
-#
-#        file_input1 = StringIO(input_automata1)
-#        file_input2 = StringIO(input_automata2)
-#        file_output = StringIO()
-#        interseccion(file_input1, file_input2, file_output)
-#
-#        expected =  '\t'.join(['(q0,q0)', '(q1,q1)']) + '\n'
-#        expected += '\t'.join(['0', '1']) + '\n'
-#        expected += '(q0,q0)\n'
-#        expected += '(q1,q1)\n'
 
     
 #    def test_interseccion_010(self):
