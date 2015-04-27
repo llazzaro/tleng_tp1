@@ -20,6 +20,8 @@ class TestEjercicioD(TestCase):
         file_output = StringIO()
         interseccion(file_input1, file_input2, file_output)
 
+        file_output.seek(0);
+
         expected =  '\t'.join(['(q0,q0)', '(q1,q1)']) + '\n'
         expected += '\t'.join(['0', '1']) + '\n'
         expected += '(q0,q0)\n'
@@ -27,6 +29,8 @@ class TestEjercicioD(TestCase):
         expected +=  '\t'.join(['(q0,q0)', '0', '(q1,q1)']) + '\n'
         expected +=  '\t'.join(['(q0,q0)', '1', '(q1,q1)']) + '\n'
         expected +=  '\t'.join(['(q1,q1)', '0', '(q0,q0)']) + '\n'
+
+        self.assertEquals(expected, file_output.read()) 
     
     
     def test_interseccion_vacia(self):

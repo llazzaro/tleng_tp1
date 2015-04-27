@@ -44,24 +44,24 @@ class Automata:
         self.finals = finals
         if type(self.finals) == list:
             self.finals = set(self.finals)
-        self._symbols = symbols
-        self._states = states
+        self.symbols = symbols
+        self.states = states
         if not symbols or not states:
-            self._states = set()
-            self._symbols = set()
+            self.states = set()
+            self.symbols = set()
             visited = set()
             queue = Queue()
             queue.put(initial)
-            self._states.add(self.initial)
+            self.states.add(self.initial)
             while not queue.empty():
                 state = queue.get()
                 if state in visited:
                     continue
                 visited.add(state)
                 for symbol, nodes in state.transitions.iteritems():
-                    self._symbols.add(symbol)
+                    self.symbols.add(symbol)
                     for node in nodes:
-                        self._states.add(node)
+                        self.states.add(node)
                         queue.put(node)
 
     def move_set(self, states, symbol):
@@ -88,42 +88,22 @@ class Automata:
         except IndexError:
             return False
 
-    def move(self, symbol):
-        raise NotImplementedError
-
-    def reset(self):
-        self.current_state = self.initial
-
     def states(self):
-        return self._states
+        return self.states
 
     def symbols(self):
-        return self._symbols
-
-    def delta(self):
-        raise NotImplementedError
-
-    def add_symbol(self, symbol):
-        self._symbols.add(symbol)
-
-    def add_state(self, state):
-        self.state.add(state)
+        return self.symbols
 
     def state_by_name(self, state_name):
-        for state in self._states:
+        for state in self.states:
             if state.name == state_name:
                 return state
         raise ValueError('State not found')
 
     def is_deterministic(self):
-        for state in self._states:
+        for state in self.states:
             for key, to_states in state.transitions.iteritems():
                 if len(to_states) > 1:
                     return False
         return True
 
-    def set_final_state(self, state_name):
-        for state in self.state:
-            if state.name == state_name:
-                self.finals.add(state)
-                return

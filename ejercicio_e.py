@@ -11,4 +11,4 @@ def complemento(archivo_automata1, archivo_automata):
     save_automata(afd_complemento(automata), archivo_automata)
 
 def afd_complemento(automata):
-    return Automata(automata.initial, automata.states().difference(automata.finals), automata.symbols(), automata.states())
+    return Automata(automata.initial, automata.states.difference(automata.finals), automata.symbols, automata.states)

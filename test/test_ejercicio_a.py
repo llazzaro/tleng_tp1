@@ -29,8 +29,8 @@ class TestEjercicioA(TestCase):
 
         dfa_automata = nfa_to_dfa(nfa_automata)
 
-        self.assertEquals(dfa_automata.symbols(), nfa_automata.symbols())
-        self.assertEquals(len(dfa_automata.states()), 3)
+        self.assertEquals(dfa_automata.symbols, nfa_automata.symbols)
+        self.assertEquals(len(dfa_automata.states), 3)
         self.assertTrue(dfa_automata.is_deterministic())
         dfa_state_q0q1 = dfa_automata.initial.transition('0')
         dfa_state_q0q2 = dfa_state_q0q1.transition('1')
@@ -74,7 +74,7 @@ class TestEjercicioA(TestCase):
 
         minimized = minimize(not_minimized)
 
-        self.assertEquals(len(minimized.states()), 2)
+        self.assertEquals(len(minimized.states), 2)
         self.assertEquals(minimized.initial.transition('0'), minimized.initial)
         other_node = minimized.initial.transition('1')
         self.assertEquals(minimized.initial.transition('1').transition('0'), minimized.initial)

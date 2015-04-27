@@ -130,8 +130,8 @@ class TestParseRegex(TestCase):
         file_input = StringIO(input_regex_tree)
 
         result = regex_to_automata(file_input)
-        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
-        self.assertEquals(len(result.states()), 4)
+        self.assertEquals(result.symbols, set(['a', LAMBDA]))
+        self.assertEquals(len(result.states), 4)
         self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
         # from_one = result.initial.transitions[LAMBDA].pop()
 
@@ -141,8 +141,8 @@ class TestParseRegex(TestCase):
         input_regex_tree = '{STAR}\n\ta'
         file_input = StringIO(input_regex_tree)
         result = regex_to_automata(file_input)
-        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
-        self.assertEquals(len(result.states()), 4)
+        self.assertEquals(result.symbols, set(['a', LAMBDA]))
+        self.assertEquals(len(result.states), 4)
         self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
 
     def test_simple_opt(self):
@@ -150,7 +150,7 @@ class TestParseRegex(TestCase):
         file_input = StringIO(input_regex_tree)
         result = regex_to_automata(file_input)
 
-        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
+        self.assertEquals(result.symbols, set(['a', LAMBDA]))
 
     def test_regex_enunciado_1(self):
         pass

@@ -6,13 +6,13 @@ def save_dot(automata, dot_file):
     dot_file.write('rankdir=LR;\n')
     dot_file.write('node [shape = none, label = "", width = 0, height = 0]; qd;\n')
     dot_file.write('node [label="\N", width = 0.5, height = 0.5];\n')
-    for state in automata.states():
+    for state in automata.states:
         if state in automata.finals:
             dot_file.write('node [shape = doublecircle]; {0};\n'.format(state.name))
     dot_file.write('node [shape = circle];\n')
     dot_file.write('qd -> {0}\n'.format(automata.initial.name))
     arc_dict = defaultdict(list)
-    for state in automata.states():
+    for state in automata.states:
         for symbol, nodes in state.transitions.iteritems():
             for node in nodes:
                 arc_dict[(state.name, node.name)].append(symbol)
@@ -25,14 +25,14 @@ def save_dot(automata, dot_file):
 
 def save_automata(automata, automata_file):
     states = ''
-    for index, state in enumerate(automata.states()):
+    for index, state in enumerate(automata.states):
         states +='{0}'.format(state.name)
         if index > 0:
             states +='\t'
     automata_file.write(states + '\n')
 
     symbols = ''
-    for symbol in automata.symbols():
+    for symbol in automata.symbols:
         symbols += '{0}'.format(symbol)
 
     automata_file.write(symbols + '\n')
@@ -46,7 +46,7 @@ def save_automata(automata, automata_file):
             finals_out += '\t'
 
     transitions_out = ''
-    for state in automata.states():
+    for state in automata.states:
         #for symbol, nodes in state.transitions:
         #    for node in nodes:
         for symbol in state.transitions:

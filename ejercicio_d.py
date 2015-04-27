@@ -21,15 +21,15 @@ def interseccion(archivo_automata1, archivo_automata2, archivo_automata):
 
 
 def afd_interseccion(automata1, automata2):
-	if automata1.symbols() != automata2.symbols():
+	if automata1.symbols != automata2.symbols:
 		raise IncompatibleAlphabetsError
 
 	if not (automata1.is_deterministic() and automata2.is_deterministic()):
 		raise NonDeterministicAutomataError
 
-	symbols = automata1.symbols()
+	symbols = automata1.symbols
 
-	state_product = dict([((s1, s2), Node(name="(" + s1.name + "," + s2.name + ")" )) for s2 in automata2.states() for s1 in automata1.states()])
+	state_product = dict([((s1, s2), Node(name="(" + s1.name + "," + s2.name + ")" )) for s2 in automata2.states for s1 in automata1.states])
 	
 	targeted_nodes = []
 	for (s1, s2) in state_product.keys():
