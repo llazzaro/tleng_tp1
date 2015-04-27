@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*- 
+#!/usr/bin/python
+
 from collections import defaultdict
 from Queue import Queue
 
@@ -128,3 +131,35 @@ class Automata:
             if state.name == state_name:
                 self.finals.add(state)
                 return
+
+    def prune_unreachable_states(self):
+        """
+            Actualiza la lista de estados para que queden sólo los alcanzables desde el inicial
+            (En la construcción de la intersección aparecen muchos estados inalcanzables)
+        """
+        self._states = set(self.reachable_states())
+        self.prune_dangling_transitions()
+
+    def reachable_states(self):
+        res = set()
+        res_prev = set([self.initial])
+
+        while len(res) < len(res_prev):
+            res = res_prev
+            for s in res_prev:
+                res = res.union(self.reachable_states_from(s))
+
+        return res
+
+    def reachable_states_from(self, state):
+        res = []
+        for a in self._symbols:
+            for s in state.transitions[a]:
+                res.append(s)
+
+        return set(res)
+        
+    def prune_dangling_transitions(self):
+        for s in self._states:
+            for a in self._symbols:
+                s.transitions[a] = s.transitions[a].intersection(self._states)
