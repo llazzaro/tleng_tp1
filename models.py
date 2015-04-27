@@ -138,7 +138,13 @@ class Automata:
             (En la construcción de la intersección aparecen muchos estados inalcanzables)
         """
         self._states = set(self.reachable_states())
-        self.prune_dangling_transitions()
+
+        #FIXME: Pese a este parche, puede pasar que haya estados no finales alcanzables,
+        # debería eliminarlos también.
+        if self._states.intersection(self.finals) == set():
+            self._states = set()
+        else:
+            self.prune_dangling_transitions()
 
     def reachable_states(self):
         res = set()
