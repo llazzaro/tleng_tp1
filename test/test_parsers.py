@@ -21,7 +21,68 @@ class TestParseAutomata(TestCase):
         file_input = StringIO(input_text)
 
         result = load_automata(file_input)
+        q0 = result.initial
+        self.assertEquals(q0.transitions.keys(), ['a'])
+        q1 = result.initial.transition('a')
+        self.assertEquals(set(q1.transitions.keys()), set(['b', 'c']))
+        q2 = result.initial.transition('a').transition('b')
+        self.assertEquals(q2.transitions.keys(), ['f'])
+
         self.assertEquals(result.symbols(), set(['a', 'b', 'c', 'd', 'e', 'f']))
+        self.assertEquals(result.states(), set([q0, q1, q2]))
+
+    def test_archivo_automata_invalido_lanza_exception_transicion_estado_invalido(self):
+
+        # caso con estados invalivos en transicion
+        input_text = 'q0\n'
+        input_text += 'a\n'
+        input_text += 'q0\n'
+        input_text += 'q0\n'
+        input_text += 'q0\ta\tq1'
+
+        file_input = StringIO(input_text)
+
+        with self.assertRaises(Exception):
+            load_automata(file_input)
+
+    def test_archivo_automata_invalido_lanza_exception_inicial_final_invalido(self):
+        # caso con estado inicial invalido
+        input_text = 'q0\n'
+        input_text += 'a\n'
+        input_text += 'q1\n'
+        input_text += 'q0\n'
+        input_text += 'q0\ta\tq0'
+
+        file_input = StringIO(input_text)
+
+        with self.assertRaises(Exception):
+            load_automata(file_input)
+
+        # caso con estado final invalido
+        input_text = 'q0\n'
+        input_text += 'a\n'
+        input_text += 'q0\n'
+        input_text += 'q0\tq1\n'
+        input_text += 'q0\ta\tq0'
+
+        file_input = StringIO(input_text)
+
+        with self.assertRaises(Exception):
+            load_automata(file_input)
+
+    def test_archivo_automata_invalido_lanza_exception_simbolo_transicion_invalido(self):
+
+        # caso con estados invalivos en transicion
+        input_text = 'q0\n'
+        input_text += 'a\n'
+        input_text += 'q0\n'
+        input_text += 'q0\n'
+        input_text += 'q0\tz\tq1'
+
+        file_input = StringIO(input_text)
+
+        with self.assertRaises(Exception):
+            load_automata(file_input)
 
 
 class TestParseRegex(TestCase):

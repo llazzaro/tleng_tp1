@@ -108,9 +108,9 @@ class TestEjercicioD(TestCase):
         input_automata2 += '\t'.join(['a', 'b']) + '\n'
         input_automata2 += 'q0\n'
         input_automata2 += 'q1\n'
-        input_automata2 += '\t'.join(['q0', '0', 'q1']) + '\n'
-        input_automata2 += '\t'.join(['q0', '1', 'q1']) + '\n'
-        input_automata2 += '\t'.join(['q1', '0', 'q0']) + '\n'
+        input_automata2 += '\t'.join(['q0', 'a', 'q1']) + '\n'
+        input_automata2 += '\t'.join(['q0', 'b', 'q1']) + '\n'
+        input_automata2 += '\t'.join(['q1', 'a', 'q0']) + '\n'
 
         file_input1 = StringIO(input_automata1)
         file_input2 = StringIO(input_automata2)

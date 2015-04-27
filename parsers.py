@@ -4,27 +4,38 @@ from models import Automata, Node, LAMBDA
 from collections import defaultdict
 
 
-def really_load_automata(automata_file):
+def load_automata(automata_file):
     states = set()
     res = None
     for index, line in enumerate(automata_file.readlines()):
         if index == 0:
+            # se cargan los states
             for state_name in line.split('\t'):
                 state = Node(name=state_name.strip('\n'))
                 states.add(state)
+            valid_state_names = map(lambda state: state.name, states)
         if index == 1:
+            # symbols
             symbols = set()
             for symbol in line.split('\t'):
                 symbols.add(symbol.strip('\n'))
         if index == 2:
+            # linea correspondiente al estado inicial
             initial_name = line.strip('\n')
+            if initial_name not in map(lambda state: state.name, states):
+                raise Exception('El estado inicial no es valido. no se encuentra en la lista de estados validos')
         if index == 3:
+            # estados finales
             finals = set()
             for final_state_name in line.split('\t'):
+                final_state_name = final_state_name.strip('\n')
+                if final_state_name not in valid_state_names:
+                    raise Exception('Formato invalido. Estado final esta en la lista de estados validos')
                 for state in states:
                     if state.name == final_state_name.strip('\n'):
                         finals.add(state)
         if index >= 4:
+            # ejes del grafo
             for state in states:
                 if initial_name == state.name:
                     initial = state
@@ -32,18 +43,20 @@ def really_load_automata(automata_file):
             res = Automata(initial, finals, symbols, states)
             # transitions
             state_1, symbol, state_2 = line.split('\t')
+            state_1 = state_1.strip('\n')
+            state_2 = state_2.strip('\n')
+
+            if state_1 not in valid_state_names or state_2 not in valid_state_names:
+                raise Exception('Se detecto un estado invalido en la informaci\'on de ejes')
+            if symbol not in symbols:
+                raise Exception('Simbolo {0} en la transici\'on es invalido'.format(symbol))
+
             node_1 = res.state_by_name(state_1)
             node_2 = res.state_by_name(state_2.strip('\n'))
+
             node_1.add_transition(symbol, node_2)
     return res
 
-
-def load_automata(automata_file):
-    try:
-        return really_load_automata(automata_file)
-    except:
-        raise Exception('Formato de archivo de automata invalido')
-        #sys.exit(1)
 
 def build_operand_dict(tree_file):
     """
