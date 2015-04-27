@@ -1,4 +1,5 @@
-import sys
+# -*- coding: utf-8 -*-
+
 import string
 from models import Automata, Node, LAMBDA
 from collections import defaultdict
@@ -58,6 +59,21 @@ def load_automata(automata_file):
     return res
 
 
+def verify_integrity(res):
+    """
+        Revisa si para los op que tienen numero de operandos,
+        este numero es valido (si hay dos param hay dos ni mas ni menos)
+
+        si encuentra algo que esta mal lanza exception
+    """
+
+    for deep, list_of_op in res.iteritems():
+        for op, number_of_operands in list_of_op:
+            if op in ['{CONCAT}', '{OR}']:
+                if len(res[deep + 1]) != number_of_operands:
+                    raise Exception('{2} requiere {0} paramteros, se encontro solamente {1} parametros'.format(len(res[deep + 1]), number_of_operands, op))
+
+
 def build_operand_dict(tree_file):
     """
         this function will return a list of "new" files
@@ -68,6 +84,7 @@ def build_operand_dict(tree_file):
     for line in tree_file.readlines():
         if '{CONCAT}' in line:
             tabs, number_of_operands = line.split('{CONCAT}')
+            number_of_operands = int(number_of_operands.strip('\n'))
             deep = len(tabs)
             res[deep].append(('{CONCAT}', number_of_operands))
         elif '{STAR}' in line:
@@ -84,21 +101,19 @@ def build_operand_dict(tree_file):
             res[deep].append(('{OPT}', None))
         elif '{OR}' in line:
             tabs, number_of_operands = line.split('{OR}')
+            number_of_operands = int(number_of_operands.strip('\n'))
             deep = len(tabs)
             res[deep].append(('{OR}', number_of_operands))
         else:
             deep = line.count('\t')
             res[deep].append(('{SYMBOL}', line.strip('\t').strip('\n')))
+    verify_integrity(res)
     return res
 
 
 def regex_to_automata(tree_file):
-    try:
-        operand_dict = build_operand_dict(tree_file)
-        res = build_automata(operand_dict[0][0], 0, operand_dict)
-    except:
-        raise Exception('Formato de archivo de regex invalido')
-        sys.exit(1)
+    operand_dict = build_operand_dict(tree_file)
+    res = build_automata(operand_dict[0][0], 0, operand_dict)
 
     return res
 
@@ -174,7 +189,7 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         # simbolo alfabeto
         assert current_operand_or_symbol[0] == '{SYMBOL}'
         symbol=current_operand_or_symbol[1]
-        assert symbol in string.letters
+        assert symbol in string.letters + '([,:;.¿?!¡()"’\&-] \t'
         initial=Node()
         final=Node()
         initial.add_transition(symbol, final)

@@ -1,3 +1,5 @@
+# -*- coding: utf-8 -*-
+
 import unittest
 from unittest import TestCase
 from StringIO import StringIO
@@ -94,6 +96,14 @@ class TestParseRegex(TestCase):
         result = regex_to_automata(file_input)
         self.assertEquals(result.finals.pop(), result.initial.transitions['a'].pop())
 
+    def test_other_symbols(self):
+        for symbol in '([,:;.¿?!¡()"’\&-]':
+            input_regex_tree = symbol
+            file_input = StringIO(input_regex_tree)
+
+            result = regex_to_automata(file_input)
+            self.assertEquals(result.finals.pop(), result.initial.transitions[symbol].pop())
+
     def test_simple_or(self):
         input_regex_tree = '{OR}2\n\ta\n\tb'
         file_input = StringIO(input_regex_tree)
@@ -157,6 +167,21 @@ class TestParseRegex(TestCase):
 
     def test_regex_enunciado_2(self):
         pass
+
+    def test_simple_invalid_or(self):
+        input_regex_tree = '{OR}3\n\ta\n\tb'
+        file_input = StringIO(input_regex_tree)
+
+        with self.assertRaises(Exception):
+            regex_to_automata(file_input)
+
+    def test_invalid_symbol(self):
+        input_regex_tree = 'á'
+        file_input = StringIO(input_regex_tree)
+
+        with self.assertRaises(Exception):
+            regex_to_automata(file_input)
+
 
 if __name__ == '__main__':
     unittest.main()
