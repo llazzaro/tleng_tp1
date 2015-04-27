@@ -139,6 +139,9 @@ class Automata:
         """
         self._states = set(self.reachable_states())
 
+		#FIXME: En realidad el tema es que antes de agregar un estado a los alcanzables,
+		# me tengo que fijar si desde ese estado se alcanza el final.
+
         #FIXME: Pese a este parche, puede pasar que haya estados no finales alcanzables,
         # debería eliminarlos también.
         if self._states.intersection(self.finals) == set():
