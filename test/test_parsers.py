@@ -31,7 +31,7 @@ class TestParseAutomata(TestCase):
         self.assertEquals(q2.transitions.keys(), ['f'])
 
         self.assertEquals(result.symbols(), set(['a', 'b', 'c', 'd', 'e', 'f']))
-        self.assertEquals(result.states(), set([q0, q1, q2]))
+        self.assertEquals(set(result.states()), set([q0, q1, q2]))
 
     def test_archivo_automata_invalido_lanza_exception_transicion_estado_invalido(self):
 
