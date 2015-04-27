@@ -44,9 +44,14 @@ class Automata:
     def __init__(self, initial, finals, symbols=None, states=None):
         self.initial = initial
         self.current_state = initial
-        self.finals = finals
-        if type(self.finals) == list:
-            self.finals = set(self.finals)
+
+        if type(finals) == list:
+            self.finals = set(finals)
+        elif isinstance(finals, Node):
+            self.finals = set([finals])
+        else:
+            self.finals = finals
+
         self._symbols = symbols
         if states:
             self._states = list(set(states))
@@ -139,28 +144,22 @@ class Automata:
         """
         self._states = set(self.reachable_states())
 
-		#FIXME: En realidad el tema es que antes de agregar un estado a los alcanzables,
-		# me tengo que fijar si desde ese estado se alcanza el final.
-
-        #FIXME: Pese a este parche, puede pasar que haya estados no finales alcanzables,
-        # debería eliminarlos también.
-        if self._states.intersection(self.finals) == set():
-            self._states = set()
-        else:
-			#FIXME: Y encima esto está de más, porque para cada estado agregás todo lo alcanzable,
-			# así que no debería quedar nada colgado.
-            self.prune_dangling_transitions()
+        self.prune_dangling_transitions()
 
     def reachable_states(self):
         res = set()
         res_prev = set([self.initial])
 
+        # Voy agarrando todos los alcanzables desde el 
         while len(res) < len(res_prev):
             res = res_prev
             for s in res_prev:
                 res = res.union(self.reachable_states_from(s))
 
-        return res
+        # Ahora saco aquellos desde los que no se llega a algún final
+        reachable = set([s for s in res if s in self.finals or not self.finals.isdisjoint(self.reachable_states_from(s))])
+
+        return reachable
 
     def reachable_states_from(self, state):
         res = []
