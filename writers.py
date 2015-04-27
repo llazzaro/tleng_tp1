@@ -24,17 +24,11 @@ def save_dot(automata, dot_file):
 
 
 def save_automata(automata, automata_file):
-    states = ''
-    for index, state in enumerate(automata.states()):
-        states +='{0}'.format(state.name)
-        if index > 0:
-            states +='\t'
+    state_names = map(lambda state: state.name, automata.states())
+    states = '\t'.join(state_names)
     automata_file.write(states + '\n')
 
-    symbols = ''
-    for symbol in automata.symbols():
-        symbols += '{0}'.format(symbol)
-
+    symbols = '\t'.join(automata.symbols())
     automata_file.write(symbols + '\n')
 
     automata_file.write(automata.initial.name + '\n')
