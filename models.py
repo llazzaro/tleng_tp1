@@ -45,14 +45,15 @@ class Automata:
         if type(self.finals) == list:
             self.finals = set(self.finals)
         self._symbols = symbols
-        self._states = states
+        if states:
+            self._states = list(set(states))
         if not symbols or not states:
-            self._states = set()
+            self._states = []
             self._symbols = set()
             visited = set()
             queue = Queue()
             queue.put(initial)
-            self._states.add(self.initial)
+            self._states.append(self.initial)
             while not queue.empty():
                 state = queue.get()
                 if state in visited:
@@ -61,7 +62,7 @@ class Automata:
                 for symbol, nodes in state.transitions.iteritems():
                     self._symbols.add(symbol)
                     for node in nodes:
-                        self._states.add(node)
+                        self._states.append(node)
                         queue.put(node)
 
     def move_set(self, states, symbol):
@@ -95,7 +96,7 @@ class Automata:
         self.current_state = self.initial
 
     def states(self):
-        return self._states
+        return list(set(self._states))
 
     def symbols(self):
         return self._symbols

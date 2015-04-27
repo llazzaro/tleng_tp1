@@ -15,7 +15,7 @@ class TestModels(TestCase):
 
         automata=Automata(initial, final)
         self.assertFalse(automata.is_deterministic())
-        self.assertEquals(automata.states(), set([initial, final, other_node]))
+        self.assertEquals(set(automata.states()), set([initial, final, other_node]))
         self.assertEquals(automata.symbols(), set(['a']))
 
     def test_is_deterministic_true(self):

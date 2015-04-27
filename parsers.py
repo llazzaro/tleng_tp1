@@ -1,18 +1,18 @@
-import sys
 import string
 from models import Automata, Node, LAMBDA
 from collections import defaultdict
 
 
 def load_automata(automata_file):
-    states = set()
+    states = []
     res = None
     for index, line in enumerate(automata_file.readlines()):
         if index == 0:
             # se cargan los states
             for state_name in line.split('\t'):
                 state = Node(name=state_name.strip('\n'))
-                states.add(state)
+                states.append(state)
+                states = list(set(states))
             valid_state_names = map(lambda state: state.name, states)
         if index == 1:
             # symbols
@@ -93,12 +93,8 @@ def build_operand_dict(tree_file):
 
 
 def regex_to_automata(tree_file):
-    try:
-        operand_dict = build_operand_dict(tree_file)
-        res = build_automata(operand_dict[0][0], 0, operand_dict)
-    except:
-        raise Exception('Formato de archivo de regex invalido')
-        sys.exit(1)
+    operand_dict = build_operand_dict(tree_file)
+    res = build_automata(operand_dict[0][0], 0, operand_dict)
 
     return res
 
