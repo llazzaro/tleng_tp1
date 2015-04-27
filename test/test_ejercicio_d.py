@@ -32,27 +32,27 @@ class TestEjercicioD(TestCase):
             self.assertIn("(" + n + "," + n + ")", result_names)
 
 
-    
-    #def test_interseccion_vacia(self):
-        #input_automata1 = '\t'.join(['q0', 'q1']) + '\n'
-        #input_automata1 += '\t'.join(['0', '1']) + '\n'
-        #input_automata1 += 'q0\n'
-        #input_automata1 += 'q1\n'
-        #input_automata1 += '\t'.join(['q0', '0', 'q1']) + '\n'
-        #input_automata1 += '\t'.join(['q0', '1', 'q0']) + '\n'
+    def test_interseccion_vacia(self):
+        input_automata1 = '\t'.join(['q0', 'q1']) + '\n'
+        input_automata1 += '\t'.join(['0', '1']) + '\n'
+        input_automata1 += 'q0\n'
+        input_automata1 += 'q1\n'
+        input_automata1 += '\t'.join(['q0', '0', 'q1']) + '\n'
+        input_automata1 += '\t'.join(['q0', '1', 'q0']) + '\n'
 
-        #input_automata2 = '\t'.join(['q0', 'q1']) + '\n'
-        #input_automata2 += '\t'.join(['0', '1']) + '\n'
-        #input_automata2 += 'q0\n'
-        #input_automata2 += 'q1\n'
-        #input_automata2 += '\t'.join(['q0', '1', 'q1']) + '\n'
-        #input_automata2 += '\t'.join(['q0', '0', 'q0']) + '\n'
+        input_automata2 = '\t'.join(['q0', 'q1']) + '\n'
+        input_automata2 += '\t'.join(['0', '1']) + '\n'
+        input_automata2 += 'q0\n'
+        input_automata2 += 'q1\n'
+        input_automata2 += '\t'.join(['q0', '1', 'q1']) + '\n'
+        input_automata2 += '\t'.join(['q0', '0', 'q0']) + '\n'
 
-        #automata1 = load_automata(StringIO(input_automata1))
-        #automata2 = load_automat(StringIO(input_automata2))
+        automata1 = load_automata(StringIO(input_automata1))
+        automata2 = load_automata(StringIO(input_automata2))
 
-        #interseccion_vacia = afd_interseccion(automata1, automata2)
+        interseccion = afd_interseccion(automata1, automata2)
 
+        self.assertEqual(0, len(interseccion.states()))
         #expected =  '\t'.join(['(q0,q0)', '(q1,q1)']) + '\n'
         #expected += '\t'.join(['0', '1']) + '\n'
         #expected += '(q0,q0)\n'
