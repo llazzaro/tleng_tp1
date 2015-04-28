@@ -1,3 +1,6 @@
+# -*- coding: utf-8 -*- 
+#!/usr/bin/python
+
 from collections import defaultdict
 from Queue import Queue
 
@@ -41,18 +44,24 @@ class Automata:
     def __init__(self, initial, finals, symbols=None, states=None):
         self.initial = initial
         self.current_state = initial
-        self.finals = finals
-        if type(self.finals) == list:
-            self.finals = set(self.finals)
+
+        if type(finals) == list:
+            self.finals = set(finals)
+        elif isinstance(finals, Node):
+            self.finals = set([finals])
+        else:
+            self.finals = finals
+
         self._symbols = symbols
-        self._states = states
+        if states:
+            self._states = list(set(states))
         if not symbols or not states:
-            self._states = set()
+            self._states = []
             self._symbols = set()
             visited = set()
             queue = Queue()
             queue.put(initial)
-            self._states.add(self.initial)
+            self._states.append(self.initial)
             while not queue.empty():
                 state = queue.get()
                 if state in visited:
@@ -61,7 +70,7 @@ class Automata:
                 for symbol, nodes in state.transitions.iteritems():
                     self._symbols.add(symbol)
                     for node in nodes:
-                        self._states.add(node)
+                        self._states.append(node)
                         queue.put(node)
 
     def move_set(self, states, symbol):
@@ -95,7 +104,7 @@ class Automata:
         self.current_state = self.initial
 
     def states(self):
-        return self._states
+        return list(set(self._states))
 
     def symbols(self):
         return self._symbols
@@ -127,3 +136,33 @@ class Automata:
             if state.name == state_name:
                 self.finals.add(state)
                 return
+
+    def prune_unreachable_states(self):
+        """
+            Actualiza la lista de estados para que queden sólo los alcanzables desde el inicial
+            (En la construcción de la intersección aparecen muchos estados inalcanzables)
+        """
+        self._states = self.all_reachable_states_from(self.initial)
+        self._states.add(self.initial)
+
+    def all_reachable_states_from(self, state):
+        res = self.reachable_states_from(state)
+        res_prev = set()
+
+        while len(res) > len(res_prev):
+            res_menor = res_prev
+            res_prev = res
+            for s in res_prev:
+                if s not in res_menor: # Módica optimización
+                    res = res.union(self.reachable_states_from(s))
+
+        return res
+
+    def reachable_states_from(self, state):
+        res = set()
+        for a in self._symbols:
+            for s in state.transitions[a]:
+                res.add(s)
+
+        return res
+        

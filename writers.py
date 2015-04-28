@@ -8,9 +8,9 @@ def save_dot(automata, dot_file):
     dot_file.write('node [label="\N", width = 0.5, height = 0.5];\n')
     for state in automata.states():
         if state in automata.finals:
-            dot_file.write('node [shape = doublecircle]; {0};\n'.format(state.name))
+            dot_file.write('node [shape = doublecircle]; "{0}";\n'.format(state.name))
     dot_file.write('node [shape = circle];\n')
-    dot_file.write('qd -> {0}\n'.format(automata.initial.name))
+    dot_file.write('qd -> "{0}"\n'.format(automata.initial.name))
     arc_dict = defaultdict(list)
     for state in automata.states():
         for symbol, nodes in state.transitions.iteritems():
@@ -19,13 +19,12 @@ def save_dot(automata, dot_file):
 
     for nodes_tuple, symbols in arc_dict.iteritems():
         symbols_comma = ', '.join(symbols)
-        dot_file.write('{0} -> {1} [label="{2}"]\n'.format(nodes_tuple[0], nodes_tuple[1], symbols_comma))
+        dot_file.write('"{0}" -> "{1}" [label="{2}"]\n'.format(nodes_tuple[0], nodes_tuple[1], symbols_comma))
     dot_file.write('}')
 
 
 def save_automata(automata, automata_file):
-    state_names = map(lambda state: state.name, automata.states())
-    states = '\t'.join(state_names)
+    states = '\t'.join(map(lambda s: s.name, automata.states()))
     automata_file.write(states + '\n')
 
     symbols = '\t'.join(automata.symbols())
@@ -33,18 +32,13 @@ def save_automata(automata, automata_file):
 
     automata_file.write(automata.initial.name + '\n')
 
-    finals_out = ''
-    for index, final_state in enumerate(automata.finals):
-        finals_out += '{0}'.format(final_state.name)
-        if index > 0:
-            finals_out += '\t'
+    finals = '\t'.join(map(lambda s: s.name, automata.finals))
+    automata_file.write(finals + '\n')
 
-    transitions_out = ''
-    for state in automata.states():
-        #for symbol, nodes in state.transitions:
-        #    for node in nodes:
-        for symbol in state.transitions:
-            for node in state.transitions[symbol]:
-                transitions_out += '{0}\t{1}\t{2}\n'.format(state.name, symbol, node.name)
+    transitions = ''
+    for source in automata.states():
+        for symbol in source.transitions:
+            for target in source.transitions[symbol]:
+                transitions += '{0}\t{1}\t{2}\n'.format(source.name, symbol, target.name)
 
-    automata_file.write(transitions_out)
+    automata_file.write(transitions)
