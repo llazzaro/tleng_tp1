@@ -56,14 +56,16 @@ def minimize(automata):
         # labels refiere a el identificador de la particion
         for symbol in automata.symbols():
             for state in automata.states():
-                labels[state.name][symbol]=previous_partition[state.transition(symbol).name]
+                if len(state.transitions[symbol]) > 0:
+                    labels[state.name][symbol]=previous_partition[state.transition(symbol).name]
 
         new_labels=defaultdict(dict)
         for state in automata.states():
             # -1 es para identificar a la columna de la equiv_k
             new_labels[state.name][-1]=previous_partition[state.name]
             for symbol in automata.symbols():
-                new_labels[state.name][symbol]=labels[state.name][symbol]
+                if symbol in labels[state.name].keys():
+                    new_labels[state.name][symbol]=labels[state.name][symbol]
 
         # esto para armar los nuevos identificadores
         # para las nuevas particiones.
