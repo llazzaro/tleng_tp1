@@ -3,6 +3,8 @@
 FILES_DIR=files
 FILE_IN1=$FILES_DIR/empieza_010.aut
 FILE_IN2=$FILES_DIR/termina_010.aut
+#FILE_IN1=$FILES_DIR/simple.aut
+#FILE_IN2=$FILES_DIR/simple.aut
 FILE_OUT=$FILES_DIR/ejd.aut
 DOT_OUT=$FILES_DIR/ejd.dot
 PNG_OUT=$FILES_DIR/ejd.png
