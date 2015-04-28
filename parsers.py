@@ -24,14 +24,14 @@ def load_automata(automata_file):
             # linea correspondiente al estado inicial
             initial_name = line.strip('\n')
             if initial_name not in map(lambda state: state.name, states):
-                raise Exception('El estado inicial no es valido. no se encuentra en la lista de estados validos')
+                raise Exception('El estado inicial {0} no es valido. no se encuentra en la lista de estados validos {1}'.format(initial_name, states))
         if index == 3:
             # estados finales
             finals = set()
             for final_state_name in line.split('\t'):
                 final_state_name = final_state_name.strip('\n')
                 if final_state_name not in valid_state_names:
-                    raise Exception('Formato invalido. Estado final esta en la lista de estados validos')
+                    raise Exception('Formato invalido. Estado final {0} esta en la lista de estados validos {1}'.format(final_state_name, states))
                 for state in states:
                     if state.name == final_state_name.strip('\n'):
                         finals.add(state)
