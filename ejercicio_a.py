@@ -38,7 +38,7 @@ def add_terminal_node(automata):
 
 
 def minimize(automata):
-    automata=add_terminal_node(automata)
+    #automata=add_terminal_node(automata)
     current_partition={}
     for state in automata.states():
         if state not in automata.finals:
