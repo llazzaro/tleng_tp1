@@ -8,9 +8,9 @@ def save_dot(automata, dot_file):
     dot_file.write('node [label="\N", width = 0.5, height = 0.5];\n')
     for state in automata.states():
         if state in automata.finals:
-            dot_file.write('node [shape = doublecircle]; {0};\n'.format(state.name))
+            dot_file.write('node [shape = doublecircle]; "{0}";\n'.format(state.name))
     dot_file.write('node [shape = circle];\n')
-    dot_file.write('qd -> {0}\n'.format(automata.initial.name))
+    dot_file.write('qd -> "{0}"\n'.format(automata.initial.name))
     arc_dict = defaultdict(list)
     for state in automata.states():
         for symbol, nodes in state.transitions.iteritems():
@@ -19,7 +19,7 @@ def save_dot(automata, dot_file):
 
     for nodes_tuple, symbols in arc_dict.iteritems():
         symbols_comma = ', '.join(symbols)
-        dot_file.write('{0} -> {1} [label="{2}"]\n'.format(nodes_tuple[0], nodes_tuple[1], symbols_comma))
+        dot_file.write('"{0}" -> "{1}" [label="{2}"]\n'.format(nodes_tuple[0], nodes_tuple[1], symbols_comma))
     dot_file.write('}')
 
 
