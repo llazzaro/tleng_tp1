@@ -53,7 +53,6 @@ class TestEjercicioD(TestCase):
         interseccion = afd_interseccion(automata1, automata2)
 
         return set.intersection(interseccion.all_reachable_states_from(interseccion.initial), interseccion.finals) 
-
     
     def test_interseccion_010(self):
         i_automata_empieza_010 =  '\t'.join(["q" + str(i) for i in range(0, 4)]) + '\n'
@@ -81,20 +80,10 @@ class TestEjercicioD(TestCase):
 
         automata_empieza_010 = load_automata(StringIO(i_automata_empieza_010))
         automata_termina_010 = load_automata(StringIO(i_automata_termina_010))
+
         automata_empieza_termina_010  = afd_interseccion(automata_empieza_010, automata_termina_010)
 
         self.assertEqual(7, len(automata_empieza_termina_010.states()))
-        #self.assertEqual(True, True)
-
-
-#        #expected = la cadena "010"
-#        expected =  '\t'.join(["(q" + str(i) + ",q" + str(i) + ")" for i in range(0, 4)]) + '\n'
-#        expected += '\t'.join(['0', '1']) + '\n'
-#        expected += '(q0,q0)' + '\n'
-#        expected += '(q3,q3)' + '\n'
-#        expected += '\t'.join(['(q0,q0)', '0', '(q1,q1)']) + '\n'
-#        expected += '\t'.join(['(q1,q1)', '1', '(q2,q2)']) + '\n'
-#        expected += '\t'.join(['(q2,q2)', '0', '(q3,q3)']) + '\n'
 
 
     def test_alfabetos_disjuntos(self):
