@@ -24,33 +24,21 @@ def save_dot(automata, dot_file):
 
 
 def save_automata(automata, automata_file):
-    states = ''
-    for index, state in enumerate(automata.states()):
-        states +='{0}'.format(state.name)
-        if index > 0:
-            states +='\t'
+    states = '\t'.join(map(lambda s: s.name, automata.states()))
     automata_file.write(states + '\n')
 
-    symbols = ''
-    for symbol in automata.symbols():
-        symbols += '{0}'.format(symbol)
-
+    symbols = '\t'.join(automata.symbols())
     automata_file.write(symbols + '\n')
 
     automata_file.write(automata.initial.name + '\n')
 
-    finals_out = ''
-    for index, final_state in enumerate(automata.finals):
-        finals_out += '{0}'.format(final_state.name)
-        if index > 0:
-            finals_out += '\t'
+    finals = '\t'.join(map(lambda s: s.name, automata.finals))
+    automata_file.write(finals + '\n')
 
-    transitions_out = ''
-    for state in automata.states():
-        #for symbol, nodes in state.transitions:
-        #    for node in nodes:
-        for symbol in state.transitions:
-            for node in state.transitions[symbol]:
-                transitions_out += '{0}\t{1}\t{2}\n'.format(state.name, symbol, node.name)
+    transitions = ''
+    for source in automata.states():
+        for symbol in source.transitions:
+            for target in source.transitions[symbol]:
+                transitions += '{0}\t{1}\t{2}\n'.format(source.name, symbol, target.name)
 
-    automata_file.write(transitions_out)
+    automata_file.write(transitions)
