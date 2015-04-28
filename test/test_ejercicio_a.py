@@ -110,8 +110,8 @@ class TestEjercicioA(TestCase):
         self.assertNotEquals(minimized.initial.transition('1').transition('1'), minimized.initial)
         self.assertFalse(minimized.initial.transition('1').transition('1') in minimized.finals)
 
-    def no_test_minimize_hopcroft_figure_4_8(self):
-        input_automata = 'a\tb\tc\td\te\tf\tg\th\n'
+    def test_minimize_hopcroft_figure_4_8(self):
+        input_automata = '\t'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) + '\n'
         input_automata += '0\t1\n'
         input_automata += 'a\n'
         input_automata += 'c\n'
@@ -120,53 +120,27 @@ class TestEjercicioA(TestCase):
         input_automata += 'b\t1\tc\n'
         input_automata += 'b\t0\tg\n'
         input_automata += 'c\t1\tc\n'
+        input_automata += 'c\t0\ta\n'
         input_automata += 'd\t0\tc\n'
         input_automata += 'd\t1\tg\n'
         input_automata += 'e\t1\tf\n'
+        input_automata += 'e\t0\th\n'
         input_automata += 'f\t0\tc\n'
         input_automata += 'f\t1\tg\n'
         input_automata += 'g\t0\tg\n'
+        input_automata += 'g\t1\te\n'
         input_automata += 'h\t0\tg\n'
         input_automata += 'h\t1\tc\n'
 
         automata = load_automata(StringIO(input_automata))
         minimized = minimize(automata)
 
-        # state_ae = minimized.initial
-        # state_bh = minimized.transition('0')
-        # state_df = minimized.transition('1')
-        # state_g = minimized.transition('0')
-        # state_c = minimized.transition('1')
-
         self.assertEquals(len(minimized.states()), 5)
+        self.assertEquals(len(minimized.finals), 1)
 
         self.assertTrue(minimized.initial.transition('0').transition('1') in minimized.finals)
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
         self.assertEquals(minimized.initial.transition('1').transition('1').transition('1'), minimized.initial)
-
-    def no_test_minimize_1(self):
-        input_automata = 'a\tb\tc\td\te\tf\n'
-        input_automata += '0\t1\n'
-        input_automata += 'a\n'
-        input_automata += 'c\td\te\n'
-        input_automata += 'a\t0\tb\n'
-        input_automata += 'b\t0\ta\n'
-        input_automata += 'a\t1\tc\n'
-        input_automata += 'b\t1\td\n'
-        input_automata += 'd\t0\te\n'
-        input_automata += 'c\t1\tf\n'
-        input_automata += 'c\t0\te\n'
-        input_automata += 'e\t0\te\n'
-        input_automata += 'e\t1\tf\n'
-        input_automata += 'f\t0\tf\n'
-        input_automata += 'f\t1\tf\n'
-        file_input = StringIO(input_automata)
-
-        automata = load_automata(file_input)
-        self.assertTrue(automata.is_deterministic())
-        minimized = minimize(automata)
-
-        self.assertTrue(minimized.is_deterministic())
 
 
 if __name__ == '__main__':
