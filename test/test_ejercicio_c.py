@@ -34,11 +34,11 @@ class TestEjercicioC(TestCase):
         expected += 'rankdir=LR;\n'
         expected += 'node [shape = none, label = "", width = 0, height = 0]; qd;\n'
         expected += 'node [label="\N", width = 0.5, height = 0.5];\n'
-        expected += 'node [shape = doublecircle]; q1;\n'
+        expected += 'node [shape = doublecircle]; "q1";\n'
         expected += 'node [shape = circle];\n'
-        expected += 'qd -> q0\n'
-        expected += 'q0 -> q1 [label="a, b"]\n'
-        expected += 'q1 -> q1 [label="a, b"]\n'
+        expected += 'qd -> "q0"\n'
+        expected += '"q0" -> "q1" [label="a, b"]\n'
+        expected += '"q1" -> "q1" [label="a, b"]\n'
         expected += '}'
 
         file_out.seek(0)
