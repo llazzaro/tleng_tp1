@@ -45,23 +45,6 @@ class TestModels(TestCase):
         self.assertEqual(automata.reachable_states_from(q0), set([q1]))
         self.assertEqual(automata.reachable_states_from(q1), set([q0]))
     
-    def test_prune_dangling_transitions(self):
-        q0 = Node("q0")
-        q1 = Node("q1")
-        q2 = Node("q2")
-
-        q0.add_transition(0, q1)
-        q0.add_transition(1, q1)
-        q1.add_transition(0, q0)
-        q1.add_transition(1, q2)
-
-        automata = Automata(q0, q1, set([0, 1]), [q0, q1])
-
-        self.assertEqual(automata.reachable_states_from(q1), set([q0, q2]))
-        automata.prune_dangling_transitions()
-        self.assertEqual(automata.reachable_states_from(q0), set([q1]))
-        self.assertEqual(automata.reachable_states_from(q1), set([q0]))
-    
     def test_prune_unreachable_states_simple(self):
         q00 = Node("q00")
         q01 = Node("q01")

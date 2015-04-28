@@ -52,7 +52,7 @@ class TestEjercicioD(TestCase):
 
         interseccion = afd_interseccion(automata1, automata2)
 
-        self.assertEqual(0, len(interseccion.states()))
+        return set.intersection(interseccion.all_reachable_states_from(interseccion.initial), interseccion.finals) 
 
     
     def test_interseccion_010(self):
@@ -81,8 +81,9 @@ class TestEjercicioD(TestCase):
 
         automata_empieza_010 = load_automata(StringIO(i_automata_empieza_010))
         automata_termina_010 = load_automata(StringIO(i_automata_termina_010))
-        automata_espero_010  = afd_interseccion(automata_empieza_010, automata_termina_010)
+        automata_empieza_termina_010  = afd_interseccion(automata_empieza_010, automata_termina_010)
 
+        self.assertEqual(7, len(automata_empieza_termina_010.states()))
         #self.assertEqual(True, True)
 
 

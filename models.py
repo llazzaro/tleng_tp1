@@ -142,34 +142,27 @@ class Automata:
             Actualiza la lista de estados para que queden sólo los alcanzables desde el inicial
             (En la construcción de la intersección aparecen muchos estados inalcanzables)
         """
-        self._states = set(self.reachable_states())
+        self._states = self.all_reachable_states_from(self.initial)
+        self._states.add(self.initial)
 
-        self.prune_dangling_transitions()
+    def all_reachable_states_from(self, state):
+        res = self.reachable_states_from(state)
+        res_prev = set()
 
-    def reachable_states(self):
-        res = set()
-        res_prev = set([self.initial])
-
-        # Voy agarrando todos los alcanzables desde el 
-        while len(res) < len(res_prev):
-            res = res_prev
+        while len(res) > len(res_prev):
+            res_menor = res_prev
+            res_prev = res
             for s in res_prev:
-                res = res.union(self.reachable_states_from(s))
+                if s not in res_menor: # Módica optimización
+                    res = res.union(self.reachable_states_from(s))
 
-        # Ahora saco aquellos desde los que no se llega a algún final
-        reachable = set([s for s in res if s in self.finals or not self.finals.isdisjoint(self.reachable_states_from(s))])
-
-        return reachable
+        return res
 
     def reachable_states_from(self, state):
-        res = []
+        res = set()
         for a in self._symbols:
             for s in state.transitions[a]:
-                res.append(s)
+                res.add(s)
 
-        return set(res)
+        return res
         
-    def prune_dangling_transitions(self):
-        for s in self._states:
-            for a in self._symbols:
-                s.transitions[a] = s.transitions[a].intersection(self._states)
