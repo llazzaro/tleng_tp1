@@ -21,15 +21,15 @@ class TestEjercicioD(TestCase):
         result = afd_interseccion(automata, automata)
 
         self.assertEqual(automata.symbols(), result.symbols())
-        self.assertEqual(len(result.states()), len(automata.states()))
-        self.assertEqual(result.initial.name, "(" + automata.initial.name + "," + automata.initial.name + ")")
-        self.assertEqual(len(result.finals), len(automata.finals))
+        self.assertEqual(len(automata.states()), len(result.states()))
+        self.assertEqual(automata.initial.name, result.initial.name)
+        self.assertEqual(len(automata.finals), len(result.finals))
         
         automata_names = set(map(lambda s: s.name, automata.finals))
         result_names = set(map(lambda s: s.name, result.finals))
 
         for n in automata_names:
-            self.assertIn("(" + n + "," + n + ")", result_names)
+            self.assertIn(n, result_names)
 
 
     def test_interseccion_vacia(self):

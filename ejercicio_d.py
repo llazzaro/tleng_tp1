@@ -48,5 +48,5 @@ def afd_interseccion(automata1, automata2):
     intersection_automata = Automata(state_product[(automata1.initial, automata2.initial)], intersection_finals, symbols, state_product.values())
     intersection_automata.prune_unreachable_states()
 
-    return intersection_automata
-    #return minimize(intersection_automata)
+    #return intersection_automata
+    return minimize(intersection_automata)
