@@ -88,31 +88,12 @@ class Automata:
                         res.add(node)
         return res
 
-    def move_sequence(self, input_sequence):
-        try:
-            for sequence_symbol in input_sequence:
-                self.current_state = list(self.current_state.transitions[sequence_symbol])[0]
-
-            return self.current_state in self.finals
-        except KeyError:
-            return False
-        except IndexError:
-            return False
-
-    def move(self, symbol):
-        raise NotImplementedError
-
-    def reset(self):
-        self.current_state = self.initial
-
+    # getters y setters
     def states(self):
         return list(set(self._states))
 
     def symbols(self):
         return self._symbols - set([LAMBDA])
-
-    def delta(self):
-        raise NotImplementedError
 
     def add_symbol(self, symbol):
         self._symbols.add(symbol)
@@ -126,6 +107,12 @@ class Automata:
                 return state
         raise ValueError('State not found')
 
+    def set_final_state(self, state_name):
+        for state in self.state:
+            if state.name == state_name:
+                self.finals.add(state)
+                return
+
     def is_deterministic(self):
         for state in self._states:
             for key, to_states in state.transitions.iteritems():
@@ -133,12 +120,22 @@ class Automata:
                     return False
         return True
 
-    def set_final_state(self, state_name):
-        for state in self.state:
-            if state.name == state_name:
-                self.finals.add(state)
-                return
+    # Métodos para recorrer el autómata con una cadena
+    def move_sequence(self, input_sequence):
+        try:
+            for sequence_symbol in input_sequence:
+                self.current_state = list(self.current_state.transitions[sequence_symbol])[0]
 
+            return self.current_state in self.finals
+        except KeyError:
+            return False
+        except IndexError:
+            return False
+
+    def reset(self):
+        self.current_state = self.initial
+
+    # Métodos utilizados para implementar la intersección
     def prune_unreachable_states(self):
         """
             Actualiza la lista de estados para que queden sólo los alcanzables desde el inicial
