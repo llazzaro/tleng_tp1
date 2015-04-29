@@ -6,6 +6,7 @@ from StringIO import StringIO
 from models import Node, Automata
 from ejercicio_a import minimize, nfa_to_dfa
 from parsers import load_automata
+#from writers import save_automata
 
 
 class TestEjercicioA(TestCase):
@@ -112,12 +113,10 @@ class TestEjercicioA(TestCase):
         #with open("files/wikipedia_min.aut", "w") as f:
         #    save_automata(minimized, f)
 
-        self.assertEquals(len(minimized.states()), 3)
+        self.assertEquals(len(minimized.states()), 2)
         self.assertTrue(minimized.initial.transition('0') == minimized.initial)
         self.assertTrue(minimized.initial.transition('1') in minimized.finals)
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
-        self.assertNotEquals(minimized.initial.transition('1').transition('1'), minimized.initial)
-        self.assertFalse(minimized.initial.transition('1').transition('1') in minimized.finals)
 
     def test_minimize_hopcroft_figure_4_8(self):
         input_automata = '\t'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) + '\n'
@@ -162,7 +161,7 @@ class TestEjercicioA(TestCase):
         minimized = minimize(automata)
 
         self.assertEquals(minimized.symbols(), automata.symbols())
-        self.assertEquals(len(minimized.states()), 5)
+        self.assertEquals(len(minimized.states()), 8)
 
 
 if __name__ == '__main__':

@@ -5,6 +5,7 @@ from StringIO import StringIO
 from parsers import load_automata
 from ejercicio_d import afd_interseccion, interseccion, IncompatibleAlphabetsError, NonDeterministicAutomataError
 
+
 class TestEjercicioD(TestCase):
 
     def test_interseccion_dos_automatas_iguales(self):
@@ -24,7 +25,7 @@ class TestEjercicioD(TestCase):
         self.assertEqual(len(automata.states()), len(result.states()))
         self.assertEqual(automata.initial.name, result.initial.name)
         self.assertEqual(len(automata.finals), len(result.finals))
-        
+
         automata_names = set(map(lambda s: s.name, automata.finals))
         result_names = set(map(lambda s: s.name, result.finals))
 

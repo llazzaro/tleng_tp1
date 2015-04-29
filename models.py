@@ -27,7 +27,9 @@ class Node(object):
             return state
 
     def __eq__(self, other):
-        return self.name == other.name or (self.nfa_states and self.nfa_states == other.nfa_states)
+        if type(self) != type(other):
+            return False
+        return self.name == other.name or (self.nfa_states is not None and self.nfa_states == other.nfa_states)
 
     def __hash__(self):
         return id(self)
@@ -153,7 +155,7 @@ class Automata:
             res_menor = res_prev
             res_prev = res
             for s in res_prev:
-                if s not in res_menor: # Módica optimización
+                if s not in res_menor:  # Módica optimización
                     res = res.union(self.reachable_states_from(s))
 
         return res
@@ -165,4 +167,3 @@ class Automata:
                 res.add(s)
 
         return res
-        

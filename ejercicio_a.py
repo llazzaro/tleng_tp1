@@ -1,6 +1,7 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
+import itertools
 from Queue import Queue
 from collections import defaultdict
 from models import Automata, LAMBDA, Node
@@ -26,6 +27,9 @@ def lambda_closure(from_states, automata):
 
 
 def add_terminal_node(automata):
+    """
+        CUIDADO: modifica la estructura del automata parametro
+    """
     terminal=Node()
     for state in automata.states():
         for symbol in automata.symbols():
@@ -37,8 +41,24 @@ def add_terminal_node(automata):
     return Automata(automata.initial, automata.finals)
 
 
+def remover_nodos_redundantes(automata):
+    to_remove = set()
+    for state in automata.states():
+        recheable_states = list(itertools.chain(*state.transitions.values()))
+        if all(map(lambda to_state: state == to_state, recheable_states)):
+            to_remove.add(state)
+
+    if to_remove:
+        for state in automata.states():
+            for symbol in automata.symbols():
+                to_states = state.transitions[symbol]
+                state.transitions[symbol] = to_states - to_remove
+
+    return Automata(automata.initial, automata.finals)
+
+
 def minimize(automata):
-    #automata=add_terminal_node(automata)
+    automata=add_terminal_node(automata)
     current_partition={}
     for state in automata.states():
         if state not in automata.finals:
@@ -102,8 +122,7 @@ def minimize(automata):
                 initial = current_new_state
 
     assert initial is not None
-
-    return Automata(initial, finals)
+    return remover_nodos_redundantes(Automata(initial, finals))
 
 
 def nfa_to_dfa(automata):
