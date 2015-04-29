@@ -9,3 +9,4 @@ PNG_OUT=$FILES_DIR/eja.png
 python AFD.py -leng $FILE_IN1 -aut $FILE_OUT
 python AFD.py -aut $FILE_OUT -dot $DOT_OUT
 dot -Tpng $DOT_OUT -o $PNG_OUT
+eog $PNG_OUT
