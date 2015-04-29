@@ -109,7 +109,12 @@ def build_operand_dict(tree_file):
             res[deep].append(('{OR}', number_of_operands))
         else:
             deep = line.count('\t')
-            res[deep].append(('{SYMBOL}', line.strip('\t').strip('\n')))
+            current_line = line.strip('\t').strip('\n')
+            if len(current_line) == 0:
+                current_line = '\t'
+                deep = deep - 1
+
+            res[deep].append(('{SYMBOL}', current_line))
     verify_integrity(res)
     return res
 
