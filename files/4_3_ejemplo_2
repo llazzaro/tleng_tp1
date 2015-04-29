@@ -1,0 +1,15 @@
+{CONCAT}2
+	{OPT}
+		{CONCAT}2
+			{STAR}
+				a
+			{CONCAT}3
+				b
+				{STAR}
+					a
+				b
+	{STAR}
+		{CONCAT}3
+			c
+			c
+			c
