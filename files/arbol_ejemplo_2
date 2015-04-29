@@ -1,0 +1,13 @@
+{CONCAT}3
+	{OPT}
+		{CONCAT}4
+			-
+			A
+			B
+			C
+	{PLUS}
+		{OR}2
+			0
+			1
+    {STAR}
+    	\t

@@ -1,0 +1,7 @@
+{CONCAT}4
+	a
+	{STAR}
+		c
+	b
+	{STAR}
+		f
