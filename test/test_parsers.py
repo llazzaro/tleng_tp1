@@ -5,6 +5,7 @@ from unittest import TestCase
 from StringIO import StringIO
 
 from parsers import regex_to_automata, load_automata
+from ejercicio_a import minimize
 from models import LAMBDA
 
 
@@ -97,7 +98,7 @@ class TestParseRegex(TestCase):
         self.assertEquals(result.finals.pop(), result.initial.transitions['a'].pop())
 
     def test_other_symbols(self):
-        for symbol in '([,:;.¿?!¡()"’\&-]':
+        for symbol in '([,:;.¿?!¡()"\'\&-]':
             input_regex_tree = symbol
             file_input = StringIO(input_regex_tree)
 
@@ -163,9 +164,45 @@ class TestParseRegex(TestCase):
         self.assertEquals(result.symbols(), set(['a', LAMBDA]))
 
     def test_regex_enunciado_1(self):
-        pass
+        # '(a|b|c)*(de)+f'
+        file_input = '{CONCAT}3\n'
+        file_input += '\t{STAR}\n'
+        file_input += '\t\t{OR}3\n'
+        file_input += '\t\t\ta\n'
+        file_input += '\t\t\tb\n'
+        file_input += '\t\t\tc\n'
+        file_input += '\t{PLUS}\n'
+        file_input += '\t\t{CONCAT}2\n'
+        file_input += '\t\t\td\n'
+        file_input += '\t\t\te\n'
+        file_input += '\tf'
+
+        result = regex_to_automata(StringIO(file_input))
+
+    def test_bug_simple(self):
+        """
+            El segundo OR usa los param del primero. este test verifica que no pase esto
+        """
+        file_input = '{CONCAT}2\n'
+        file_input += '\t{OR}2\n'
+        file_input += '\t\ta\n'
+        file_input += '\t\tb\n'
+        file_input += '\t{OR}2\n'
+        file_input += '\t\tc\n'
+        file_input += '\t\td'
+        file_input = StringIO(file_input)
+        result = regex_to_automata(file_input)
+        self.assertEquals(len(result.states()), 12)
+        self.assertEquals(len(result.finals), 1)
+
+        minimized = minimize(result)
+        import ipdb
+        ipdb.set_trace()
 
     def test_regex_enunciado_2(self):
+        # '(-ABC)?(0|1)+\t*'
+        #file_input = StringIO('(-ABC)?(0|1)+\t*')
+        # result = regex_to_automata(file_input)
         pass
 
     def test_simple_invalid_or(self):

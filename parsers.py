@@ -48,8 +48,10 @@ def load_automata(automata_file):
             state_1 = state_1.strip('\n')
             state_2 = state_2.strip('\n')
 
-            if state_1 not in valid_state_names or state_2 not in valid_state_names:
-                raise Exception('Se detecto un estado invalido en la informaci\'on de ejes')
+            if state_1 not in valid_state_names:
+                raise Exception('Se detecto un estado {0} invalido en la informaci\'on de ejes. Validos {1}'.format(state_1, valid_state_names))
+            if state_2 not in valid_state_names:
+                raise Exception('Se detecto un estado {0} invalido en la informaci\'on de ejes Validos {1}'.format(state_2, valid_state_names))
             if symbol not in symbols:
                 raise Exception('Simbolo {0} en la transici\'on es invalido'.format(symbol))
 
@@ -71,8 +73,8 @@ def verify_integrity(res):
     for deep, list_of_op in res.iteritems():
         for op, number_of_operands in list_of_op:
             if op in ['{CONCAT}', '{OR}']:
-                if len(res[deep + 1]) != number_of_operands:
-                    raise Exception('{2} requiere {0} paramteros, se encontro solamente {1} parametros'.format(len(res[deep + 1]), number_of_operands, op))
+                if len(res[deep + 1]) < number_of_operands:
+                    raise Exception('{2} requiere {1} paramteros, se encontro solamente {0} parametros'.format(len(res[deep + 1]), number_of_operands, op))
 
 
 def build_operand_dict(tree_file):
@@ -121,9 +123,11 @@ def regex_to_automata(tree_file):
 
 def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
     if '{CONCAT}' == current_operand_or_symbol[0]:
+        number_of_operands = current_operand_or_symbol[1]
         initial = Node()
         next_node = None
-        operand_or_symbols = operand_or_symbol_dict[deep + 1]
+        finals = None
+        operand_or_symbols = operand_or_symbol_dict[deep + 1][:number_of_operands]
         operand_or_symbols.reverse()
         for operand in operand_or_symbols:
             operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
@@ -134,8 +138,8 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
                 finals = operand_automata.finals
             next_node = operand_automata.initial
 
-        initial.add_transition(LAMBDA, next_node)
-        return Automata(initial, finals)
+        operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][number_of_operands:]
+        return Automata(next_node, finals)
     elif '{STAR}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
@@ -178,19 +182,22 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
     elif '{OR}' in current_operand_or_symbol[0]:
         initial = Node()
         new_final = Node()
+        number_of_operands = current_operand_or_symbol[1]
+        operand_or_symbols = operand_or_symbol_dict[deep + 1][:number_of_operands]
 
-        for operand in operand_or_symbol_dict[deep + 1]:
+        for operand in operand_or_symbols:
             operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
             initial.add_transition(LAMBDA, operand_automata.initial)
             for final in operand_automata.finals:
                 final.add_transition(LAMBDA, new_final)
 
+        operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][number_of_operands:]
         return Automata(initial, set([new_final]))
     else:
         # simbolo alfabeto
         assert current_operand_or_symbol[0] == '{SYMBOL}'
         symbol=current_operand_or_symbol[1]
-        assert symbol in string.letters + '([,:;.¿?!¡()"’\&-] \t'
+        assert symbol in string.letters + '([,:;.¿?!¡()"\'\&-] \t'
         initial=Node()
         final=Node()
         initial.add_transition(symbol, final)
