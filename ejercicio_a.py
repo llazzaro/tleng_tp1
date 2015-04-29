@@ -26,6 +26,9 @@ def lambda_closure(from_states, automata):
     return res
 
 def copy_with_terminal_node(automata):
+    return add_terminal_node(automata)
+
+def add_terminal_node(automata):
     terminal=Node("qT")
     states = automata.states()
     finals = set()
@@ -49,19 +52,19 @@ def copy_with_terminal_node(automata):
 
     return Automata(initial, finals, automata.symbols(), states)
 
-def add_terminal_node(automata):
-    """
-        CUIDADO: modifica la estructura del automata parametro
-    """
-    terminal=Node()
-    for state in automata.states():
-        for symbol in automata.symbols():
-            state.add_transition(symbol, terminal)
-
-    for symbol in automata.symbols():
-        terminal.add_transition(symbol, terminal)
-
-    return Automata(automata.initial, automata.finals)
+#def add_terminal_node(automata):
+#    """
+#        CUIDADO: modifica la estructura del automata parametro
+#    """
+#    terminal=Node()
+#    for state in automata.states():
+#        for symbol in automata.symbols():
+#            state.add_transition(symbol, terminal)
+#
+#    for symbol in automata.symbols():
+#        terminal.add_transition(symbol, terminal)
+#
+#    return Automata(automata.initial, automata.finals)
 
 
 def remover_nodos_redundantes(automata):

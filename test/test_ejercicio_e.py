@@ -6,7 +6,6 @@ from unittest import TestCase
 from StringIO import StringIO
 
 from parsers import load_automata
-from ejercicio_a import copy_with_terminal_node
 from ejercicio_e import afd_complemento
 
 class TestEjercicioE(TestCase):
@@ -21,8 +20,6 @@ class TestEjercicioE(TestCase):
         input_automata += '\t'.join(['q1', '0', 'q0']) + '\n'
 
         automata = load_automata(StringIO(input_automata))
-
-        aut_with_terminal = copy_with_terminal_node(automata)
 
         automata_complemento = afd_complemento(automata)
 

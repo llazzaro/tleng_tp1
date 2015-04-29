@@ -1,8 +1,8 @@
 #!/bin/sh
 
 FILES_DIR=files
-FILE_IN1=$FILES_DIR/termina_010.aut
-#FILE_IN1=$FILES_DIR/empieza_010.aut
+#FILE_IN1=$FILES_DIR/termina_010.aut
+FILE_IN1=$FILES_DIR/empieza_010.aut
 FILE_OUT=$FILES_DIR/eje.aut
 DOT_OUT=$FILES_DIR/eje.dot
 PNG_OUT=$FILES_DIR/eje.png
