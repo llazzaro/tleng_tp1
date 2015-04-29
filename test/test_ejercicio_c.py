@@ -8,15 +8,6 @@ from ejercicio_c import grafo
 class TestEjercicioC(TestCase):
 
     def test_save_dot_(self):
-        input_regex = '{CONCAT}2\n'
-        input_regex += '\t{OR}2\n'
-        input_regex += '\t\ta\n'
-        input_regex += '\t\tb\n'
-        input_regex += '\t{START}\n'
-        input_regex += '\t\t{OR}2\n'
-        input_regex += '\t\t\ta\n'
-        input_regex += '\t\t\tb\n'
-
         input_automata = 'q0\tq1\n'
         input_automata += 'a\tb\n'
         input_automata += 'q0\n'
