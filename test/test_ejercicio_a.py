@@ -6,7 +6,6 @@ from StringIO import StringIO
 from models import Node, Automata, LAMBDA
 from ejercicio_a import minimize, nfa_to_dfa
 from parsers import load_automata
-#from writers import save_automata
 
 
 class TestEjercicioA(TestCase):
@@ -103,15 +102,14 @@ class TestEjercicioA(TestCase):
         input_automata += '\t'.join(['e', '1', 'f']) + '\n'
         input_automata += '\t'.join(['f', '0', 'f']) + '\n'
         input_automata += '\t'.join(['f', '1', 'f'])
-
         automata = load_automata(StringIO(input_automata))
 
-        #with open("files/wikipedia.aut", "w") as f:
+        # with open("files/wikipedia.aut", "w") as f:
         #    save_automata(automata, f)
 
         minimized = minimize(automata)
 
-        #with open("files/wikipedia_min.aut", "w") as f:
+        # with open("files/wikipedia_min.aut", "w") as f:
         #    save_automata(minimized, f)
 
         self.assertEquals(len(minimized.states()), 2)

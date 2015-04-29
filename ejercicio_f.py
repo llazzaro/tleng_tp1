@@ -29,8 +29,11 @@ def identicos(automata_1, automata_2):
         if state_2:
             for symbol in automata_1.symbols():
                 # revisamos las transitions
-                if state_1.transition(symbol).name != state_2[0].transition(symbol).name:
-                    return False
+                if state_1.transition(symbol) is not None:
+                    if state_2[0].transition(symbol) is None:
+                        return False
+                    if state_1.transition(symbol).name != state_2[0].transition(symbol).name:
+                        return False
         else:
             return False
 
