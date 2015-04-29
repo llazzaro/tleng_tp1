@@ -45,7 +45,7 @@ def remover_nodos_redundantes(automata):
     to_remove = set()
     for state in automata.states():
         recheable_states = list(itertools.chain(*state.transitions.values()))
-        if all(map(lambda to_state: state == to_state, recheable_states)):
+        if all(map(lambda to_state: state == to_state, recheable_states)) and state not in automata.finals:
             to_remove.add(state)
 
     if to_remove:
