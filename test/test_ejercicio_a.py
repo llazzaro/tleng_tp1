@@ -6,7 +6,6 @@ from StringIO import StringIO
 from models import Node, Automata
 from ejercicio_a import minimize, nfa_to_dfa
 from parsers import load_automata
-#from writers import save_automata
 
 
 class TestEjercicioA(TestCase):

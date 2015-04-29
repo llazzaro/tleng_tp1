@@ -194,10 +194,8 @@ class TestParseRegex(TestCase):
         result = regex_to_automata(file_input)
         self.assertEquals(len(result.states()), 12)
         self.assertEquals(len(result.finals), 1)
-
         minimized = minimize(result)
-        import ipdb
-        ipdb.set_trace()
+        self.assertEquals(result.symbols(), minimized.symbols())
 
     def test_regex_enunciado_2(self):
         # '(-ABC)?(0|1)+\t*'

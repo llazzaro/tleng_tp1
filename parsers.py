@@ -124,22 +124,25 @@ def regex_to_automata(tree_file):
 def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
     if '{CONCAT}' == current_operand_or_symbol[0]:
         number_of_operands = current_operand_or_symbol[1]
-        initial = Node()
-        next_node = None
+        initial = None
         finals = None
-        operand_or_symbols = operand_or_symbol_dict[deep + 1][:number_of_operands]
-        operand_or_symbols.reverse()
+        operand_or_symbols = operand_or_symbol_dict[deep + 1]
+        operand_or_symbols = operand_or_symbols[:number_of_operands]
+        operand_automatas = []
         for operand in operand_or_symbols:
-            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-            if next_node:
-                for final in operand_automata.finals:
-                    final.add_transition(LAMBDA, next_node)
-            else:
-                finals = operand_automata.finals
-            next_node = operand_automata.initial
+            operand_automatas.append(build_automata(operand, deep + 1, operand_or_symbol_dict))
+
+        initial = operand_automatas[0].initial
+        for index, operand_automata in enumerate(operand_automatas):
+            if index > len(operand_automatas) - 2:
+                # es el ultimo operando
+                continue
+            for final in operand_automata.finals:
+                final.add_transition(LAMBDA, operand_automatas[index + 1].initial)
 
         operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][number_of_operands:]
-        return Automata(next_node, finals)
+        finals = operand_automatas[-1:][0].finals
+        return Automata(initial, finals)
     elif '{STAR}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
