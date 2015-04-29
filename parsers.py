@@ -206,7 +206,8 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         # simbolo alfabeto
         assert current_operand_or_symbol[0] == '{SYMBOL}'
         symbol=current_operand_or_symbol[1]
-        assert symbol in string.letters + '([,:;.¿?!¡()"\'\&-] \t'
+        if symbol not in string.letters + '([,:;.¿?!¡()"\'\&-] \t' + '0123456789':
+            raise Exception('El simbolo {0} no esta permitido'.format(symbol))
         initial=Node()
         final=Node()
         initial.add_transition(symbol, final)

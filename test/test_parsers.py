@@ -204,9 +204,28 @@ class TestParseRegex(TestCase):
 
     def test_regex_enunciado_2(self):
         # '(-ABC)?(0|1)+\t*'
-        #file_input = StringIO('(-ABC)?(0|1)+\t*')
+        # file_input = StringIO('(-ABC)?(0|1)+\t*')
         # result = regex_to_automata(file_input)
-        pass
+        file_input = '{CONCAT}3\n'
+        file_input += '\t{OPT}\n'
+        file_input += '\t\t{CONCAT}4\n'
+        file_input += '\t\t\t-\n'
+        file_input += '\t\t\tA\n'
+        file_input += '\t\t\tB\n'
+        file_input += '\t\t\tC\n'
+        file_input += '\t{PLUS}\n'
+        file_input += '\t\t{OR}2\n'
+        file_input += '\t\t\t0\n'
+        file_input += '\t\t\t1\n'
+        file_input += '\t{STAR}\n'
+        file_input += '\t\t\t'
+
+        file_input = StringIO(file_input)
+        result = regex_to_automata(file_input)
+        self.assertEquals(len(result.states()), 22)
+        minimized = minimize(result)
+        self.assertTrue(LAMBDA not in minimized.symbols())
+        self.assertEquals(result.symbols(), minimized.symbols())
 
     def test_simple_invalid_or(self):
         input_regex_tree = '{OR}3\n\ta\n\tb'
