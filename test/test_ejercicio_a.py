@@ -3,7 +3,7 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from models import Node, Automata
+from models import Node, Automata, LAMBDA
 from ejercicio_a import minimize, nfa_to_dfa
 from parsers import load_automata
 #from writers import save_automata
@@ -78,6 +78,7 @@ class TestEjercicioA(TestCase):
         minimized = minimize(not_minimized)
 
         self.assertEquals(len(minimized.states()), 2)
+        self.assertTrue(LAMBDA not in minimized.symbols())
         self.assertEquals(minimized.symbols(), not_minimized.symbols())
         self.assertEquals(minimized.initial.transition('0'), minimized.initial)
         other_node = minimized.initial.transition('1')
@@ -114,6 +115,7 @@ class TestEjercicioA(TestCase):
         #    save_automata(minimized, f)
 
         self.assertEquals(len(minimized.states()), 2)
+        self.assertTrue(LAMBDA not in minimized.symbols())
         self.assertTrue(minimized.initial.transition('0') == minimized.initial)
         self.assertTrue(minimized.initial.transition('1') in minimized.finals)
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
@@ -145,6 +147,7 @@ class TestEjercicioA(TestCase):
 
         self.assertEquals(len(minimized.states()), 5)
         self.assertEquals(len(minimized.finals), 1)
+        self.assertTrue(LAMBDA not in minimized.symbols())
 
         self.assertTrue(minimized.initial.transition('0').transition('1') in minimized.finals)
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
@@ -162,6 +165,7 @@ class TestEjercicioA(TestCase):
 
         self.assertEquals(minimized.symbols(), automata.symbols())
         self.assertEquals(len(minimized.states()), 8)
+        self.assertTrue(LAMBDA not in minimized.symbols())
 
 
 if __name__ == '__main__':
