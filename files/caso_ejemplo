@@ -1,0 +1,8 @@
+{CONCAT}2
+	{OR}2
+		a
+		b
+	{STAR}
+		{OR}2
+			a
+			b
