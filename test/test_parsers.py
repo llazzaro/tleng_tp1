@@ -177,7 +177,12 @@ class TestParseRegex(TestCase):
         file_input += '\t\t\te\n'
         file_input += '\tf'
 
-        result = regex_to_automata(StringIO(file_input))
+        file_input = StringIO(file_input)
+
+        result = regex_to_automata(file_input)
+        self.assertTrue(result.symbols, set(['a', 'b', 'c', 'd', 'e', 'f']))
+        import ipdb
+        ipdb.set_trace()
 
     def test_bug_simple(self):
         """
