@@ -141,7 +141,7 @@ class TestParseRegex(TestCase):
         file_input = StringIO(input_regex_tree)
 
         result = regex_to_automata(file_input)
-        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
+        self.assertEquals(result.symbols(), set(['a']))
         self.assertEquals(len(result.states()), 4)
         self.assertEquals(len(result.initial.transitions[LAMBDA]), 1)
         # from_one = result.initial.transitions[LAMBDA].pop()
@@ -152,7 +152,7 @@ class TestParseRegex(TestCase):
         input_regex_tree = '{STAR}\n\ta'
         file_input = StringIO(input_regex_tree)
         result = regex_to_automata(file_input)
-        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
+        self.assertEquals(result.symbols(), set(['a']))
         self.assertEquals(len(result.states()), 4)
         self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
         self.assertTrue(result.initial.transition('@') in result.initial.transition('@').transition('a').transitions.values()[0])
@@ -162,7 +162,7 @@ class TestParseRegex(TestCase):
         file_input = StringIO(input_regex_tree)
         result = regex_to_automata(file_input)
 
-        self.assertEquals(result.symbols(), set(['a', LAMBDA]))
+        self.assertEquals(result.symbols(), set(['a']))
         self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
 
     def test_regex_enunciado_1(self):

@@ -109,7 +109,7 @@ class Automata:
         return list(set(self._states))
 
     def symbols(self):
-        return self._symbols
+        return self._symbols - set([LAMBDA])
 
     def delta(self):
         raise NotImplementedError

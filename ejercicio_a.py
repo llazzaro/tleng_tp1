@@ -74,7 +74,7 @@ def minimize(automata):
 
         # previous partitons es equiv_(n-1)
         # labels refiere a el identificador de la particion
-        for symbol in automata.symbols():
+        for symbol in automata.symbols().union(set([LAMBDA])):
             for state in automata.states():
                 if len(state.transitions[symbol]) > 0:
                     labels[state.name][symbol]=previous_partition[state.transition(symbol).name]
@@ -83,7 +83,7 @@ def minimize(automata):
         for state in automata.states():
             # -1 es para identificar a la columna de la equiv_k
             new_labels[state.name][-1]=previous_partition[state.name]
-            for symbol in automata.symbols():
+            for symbol in automata.symbols().union(set([LAMBDA])):
                 if symbol in labels[state.name].keys():
                     new_labels[state.name][symbol]=labels[state.name][symbol]
 
@@ -107,7 +107,7 @@ def minimize(automata):
     finals=set()
 
     for state in automata.states():
-        for symbol in automata.symbols():
+        for symbol in automata.symbols().union(set([LAMBDA])):
             new_label=current_partition[state.name]
             try:
                 to_state=min_states_by_name[labels[state.name][symbol]]
