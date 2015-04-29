@@ -129,7 +129,7 @@ class TestParseRegex(TestCase):
 
         result = regex_to_automata(file_input)
         final = result.finals.pop()
-        node = result.initial.transitions[LAMBDA].pop()
+        node = result.initial
         node = node.transitions['c'].pop()
         node = node.transitions[LAMBDA].pop()
         node = node.transitions['b'].pop()
@@ -143,7 +143,7 @@ class TestParseRegex(TestCase):
         result = regex_to_automata(file_input)
         self.assertEquals(result.symbols(), set(['a', LAMBDA]))
         self.assertEquals(len(result.states()), 4)
-        self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
+        self.assertEquals(len(result.initial.transitions[LAMBDA]), 1)
         # from_one = result.initial.transitions[LAMBDA].pop()
 
         # from_two = result.initial.transitions[LAMBDA].pop()
@@ -155,6 +155,7 @@ class TestParseRegex(TestCase):
         self.assertEquals(result.symbols(), set(['a', LAMBDA]))
         self.assertEquals(len(result.states()), 4)
         self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
+        self.assertTrue(result.initial.transition('@') in result.initial.transition('@').transition('a').transitions.values()[0])
 
     def test_simple_opt(self):
         input_regex_tree = '{OPT}\n\ta'
@@ -162,6 +163,7 @@ class TestParseRegex(TestCase):
         result = regex_to_automata(file_input)
 
         self.assertEquals(result.symbols(), set(['a', LAMBDA]))
+        self.assertEquals(len(result.initial.transitions[LAMBDA]), 2)
 
     def test_regex_enunciado_1(self):
         # '(a|b|c)*(de)+f'
@@ -181,8 +183,6 @@ class TestParseRegex(TestCase):
 
         result = regex_to_automata(file_input)
         self.assertTrue(result.symbols, set(['a', 'b', 'c', 'd', 'e', 'f']))
-        import ipdb
-        ipdb.set_trace()
 
     def test_bug_simple(self):
         """

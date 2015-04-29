@@ -146,14 +146,14 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
     elif '{STAR}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
-        initial.add_transition(LAMBDA, final)
         for operand in operand_or_symbol_dict[deep + 1][:1]:
             operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-        initial.add_transition(LAMBDA, operand_automata.initial)
         for dfa_final in operand_automata.finals:
             dfa_final.add_transition(LAMBDA, final)
             dfa_final.add_transition(LAMBDA, operand_automata.initial)
 
+        initial.add_transition(LAMBDA, operand_automata.initial)
+        initial.add_transition(LAMBDA, final)
         operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][1:]
         return Automata(initial, set([final]))
     elif '{PLUS}' in current_operand_or_symbol[0]:
