@@ -25,6 +25,29 @@ def lambda_closure(from_states, automata):
                     res.add(node)
     return res
 
+def copy_with_terminal_node(automata):
+    terminal=Node("qT")
+    states = automata.states()
+    finals = set()
+    initial = None
+
+    #recorro los nodos, me fijo cuales son inicial/finales 
+    # y los modifico para que pasen al trampa cuando corresponda
+    for state in states:
+        if state in automata.finals:
+            finals.add(state)
+        if state == automata.initial:
+            initial = state
+        for symbol in automata.symbols():
+            if state.transitions[symbol] == set():
+                state.add_transition(symbol, terminal)
+
+    for symbol in automata.symbols():
+        terminal.add_transition(symbol, terminal)
+
+    states.append(terminal)
+
+    return Automata(initial, finals, automata.symbols(), states)
 
 def add_terminal_node(automata):
     """

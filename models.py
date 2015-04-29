@@ -143,6 +143,7 @@ class Automata:
         """
         self._states = self.all_reachable_states_from(self.initial)
         self._states.add(self.initial)
+        self.finals = self.finals & self._states
 
     def all_reachable_states_from(self, state):
         res = self.reachable_states_from(state)
