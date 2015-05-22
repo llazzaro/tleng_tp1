@@ -11,17 +11,25 @@ class Node(object):
 
     NODE_INDEX = 0
 
-    def __init__(self, name=None, nfa_states=None):
+    def __init__(self, name=None, nfastates=None):
         self.name = name
         if not name:
             self.name = 'q{0}'.format(Node.NODE_INDEX)
-        self.nfa_states = nfa_states
+        self.nfastates = nfastates
         Node.NODE_INDEX += 1
-        self.transitions = defaultdict(set)
+        self.transitions = {}
 
     def add_transition(self, symbol, state):
-        self.transitions[symbol].add(state)
+        if self.transitions.has_key(symbol):
+            self.transitions[symbol].append(state)
+        else:
+            self.transitions[symbol] = [state]
 
+    def is_deterministic(self):
+        symbols = self.transitions.keys()
+        return LAMBDA not in symbols and len(symbols) == len(set(symbols))
+
+    #FIXME: Posiblemente inútil.
     def transition(self, symbol):
         for state in self.transitions[symbol]:
             return state
@@ -29,7 +37,7 @@ class Node(object):
     def __eq__(self, other):
         if type(self) != type(other):
             return False
-        return self.name == other.name or (self.nfa_states is not None and self.nfa_states == other.nfa_states)
+        return self.name == other.name or (self.nfastates is not None and self.nfastates == other.nfastates)
 
     def __hash__(self):
         return id(self)
@@ -41,39 +49,28 @@ class Node(object):
         return str(self.name)
 
 
-class Automata:
+class FinalsNotInStatesException(Exception):
+    pass
 
-    def __init__(self, initial, finals, symbols=None, states=None):
+class UnexpectedSymbolOnStateException(Exception):
+    pass
+
+class Automata:
+    def __init__(self, initial, finals, symbols, states):
         self.initial = initial
         self.current_state = initial
+    
+        for s in states:
+            if set(s.transitions.keys()) - set(symbols) != set():
+                raise UnexpectedSymbolOnStateException
 
-        if type(finals) == list:
-            self.finals = set(finals)
-        elif isinstance(finals, Node):
-            self.finals = set([finals])
-        else:
-            self.finals = finals
+        if set(finals) - set(states) != set():
+            raise FinalsNotInStatesException
 
-        self._symbols = symbols
-        if states:
-            self._states = list(set(states))
-        if not symbols or not states:
-            self._states = []
-            self._symbols = set()
-            visited = set()
-            queue = Queue()
-            queue.put(initial)
-            self._states.append(self.initial)
-            while not queue.empty():
-                state = queue.get()
-                if state in visited:
-                    continue
-                visited.add(state)
-                for symbol, nodes in state.transitions.iteritems():
-                    self._symbols.add(symbol)
-                    for node in nodes:
-                        self._states.append(node)
-                        queue.put(node)
+        self.finals = finals
+
+        self.symbols = symbols
+        self.states = states
 
     def move_set(self, states, symbol):
         """
@@ -88,35 +85,31 @@ class Automata:
                         res.add(node)
         return res
 
-    # getters y setters
-    def states(self):
-        return list(set(self._states))
+    #def add_symbol(self, symbol):
+    #    self.symbols.add(symbol)
 
-    def symbols(self):
-        return self._symbols - set([LAMBDA])
-
-    def add_symbol(self, symbol):
-        self._symbols.add(symbol)
-
-    def add_state(self, state):
-        self.state.add(state)
+    #def add_state(self, state):
+    #    self.state.add(state)
 
     def state_by_name(self, state_name):
-        for state in self._states:
+        for state in self.states:
             if state.name == state_name:
                 return state
         raise ValueError('State not found')
 
-    def set_final_state(self, state_name):
-        for state in self.state:
-            if state.name == state_name:
-                self.finals.add(state)
-                return
+    #def set_final_state(self, state_name):
+    #    for state in self.state:
+    #        if state.name == state_name:
+    #            self.finals.add(state)
+    #            return
+
+    def has_lambda(self):
+        return LAMBDA in self.symbols
 
     def is_deterministic(self):
-        for state in self._states:
-            for key, to_states in state.transitions.iteritems():
-                if len(to_states) > 1:
+        for state in self.states:
+            for key, tostates in state.transitions.iteritems():
+                if len(tostates) > 1:
                     return False
         return True
 
@@ -136,17 +129,17 @@ class Automata:
         self.current_state = self.initial
 
     # Métodos utilizados para implementar la intersección
-    def prune_unreachable_states(self):
+    def prune_unreachablestates(self):
         """
             Actualiza la lista de estados para que queden sólo los alcanzables desde el inicial
             (En la construcción de la intersección aparecen muchos estados inalcanzables)
         """
-        self._states = self.all_reachable_states_from(self.initial)
-        self._states.add(self.initial)
-        self.finals = self.finals & self._states
+        self.states = self.all_reachablestates_from(self.initial)
+        self.states.add(self.initial)
+        self.finals = self.finals & self.states
 
-    def all_reachable_states_from(self, state):
-        res = self.reachable_states_from(state)
+    def all_reachablestates_from(self, state):
+        res = self.reachablestates_from(state)
         res_prev = set()
 
         while len(res) > len(res_prev):
@@ -154,13 +147,13 @@ class Automata:
             res_prev = res
             for s in res_prev:
                 if s not in res_menor:  # Módica optimización
-                    res = res.union(self.reachable_states_from(s))
+                    res = res.union(self.reachablestates_from(s))
 
         return res
 
-    def reachable_states_from(self, state):
+    def reachablestates_from(self, state):
         res = set()
-        for a in self._symbols:
+        for a in self.symbols:
             for s in state.transitions[a]:
                 res.add(s)
 

@@ -6,60 +6,60 @@ from collections import defaultdict
 
 
 def load_automata(automata_file):
+    states_line = automata_file.readline()
     states = []
-    res = None
-    for index, line in enumerate(automata_file.readlines()):
-        if index == 0:
-            # se cargan los states
-            for state_name in line.split('\t'):
-                state = Node(name=state_name.strip('\n'))
-                states.append(state)
-                states = list(set(states))
-            valid_state_names = map(lambda state: state.name, states)
-        if index == 1:
-            # symbols
-            symbols = set()
-            for symbol in line.split('\t'):
-                symbols.add(symbol.strip('\n'))
-        if index == 2:
-            # linea correspondiente al estado inicial
-            initial_name = line.strip('\n')
-            if initial_name not in map(lambda state: state.name, states):
-                raise Exception('El estado inicial {0} no es valido. no se encuentra en la lista de estados validos {1}'.format(initial_name, states))
-        if index == 3:
-            # estados finales
-            finals = set()
-            for final_state_name in line.split('\t'):
-                final_state_name = final_state_name.strip('\n')
-                if final_state_name not in valid_state_names:
-                    raise Exception('Formato invalido. Estado final {0} esta en la lista de estados validos {1}'.format(final_state_name, states))
-                for state in states:
-                    if state.name == final_state_name.strip('\n'):
-                        finals.add(state)
-        if index >= 4:
-            # ejes del grafo
+    for state_name in states_line.split('\t'):
+        state = Node(name=state_name.strip('\n'))
+        states.append(state)
+        states = list(set(states))
+
+    valid_state_names = map(lambda state: state.name, states)
+
+    symbol_line = automata_file.readline()
+    symbols = []
+    for symbol in symbol_line.split('\t'):
+        symbols.append(symbol.strip('\n'))
+
+    initial_line = automata_file.readline()
+    initial_name = initial_line.strip('\n')
+    if initial_name not in valid_state_names:
+        raise Exception('El estado inicial {0} no es valido. no se encuentra en la lista de estados validos {1}'.format(initial_name, states))
+
+    finals_line = automata_file.readline()
+    finals = []
+    for final_state_name in finals_line.split('\t'):
+        final_state_name = final_state_name.strip('\n')
+        if final_state_name not in valid_state_names:
+            raise Exception('Formato invalido. Estado final {0} esta en la lista de estados validos {1}'.format(final_state_name, states))
+        else:
             for state in states:
-                if initial_name == state.name:
-                    initial = state
-                    break
-            res = Automata(initial, finals, symbols, states)
-            # transitions
-            state_1, symbol, state_2 = line.split('\t')
-            state_1 = state_1.strip('\n')
-            state_2 = state_2.strip('\n')
+                if state.name == final_state_name.strip('\n'):
+                    finals.append(state)
 
-            if state_1 not in valid_state_names:
-                raise Exception('Se detecto un estado {0} invalido en la informaci\'on de ejes. Validos {1}'.format(state_1, valid_state_names))
-            if state_2 not in valid_state_names:
-                raise Exception('Se detecto un estado {0} invalido en la informaci\'on de ejes Validos {1}'.format(state_2, valid_state_names))
-            if symbol not in symbols:
-                raise Exception('Simbolo {0} en la transici\'on es invalido'.format(symbol))
+    for transition_line in automata_file:
+        transition = transition_line.split('\t')
+        tr_src_name = transition[0]
+        tr_sym = transition[1]
+        tr_tgt_name = transition[2].strip('\n')
 
-            node_1 = res.state_by_name(state_1)
-            node_2 = res.state_by_name(state_2.strip('\n'))
+        tr_src_state = None
+        tr_tgt_state = None
 
-            node_1.add_transition(symbol, node_2)
-    return res
+        for state in states:
+            #print state.name
+            if tr_src_state == None and state.name == tr_src_name:
+                tr_src_state = state
+            if tr_tgt_state == None and state.name == tr_tgt_name:
+                tr_tgt_state = state
+
+        if tr_src_state == None:
+            raise Exception('Formato invalido. La transición {0} --{1}--> {2} parte de un estado que no está en la lista: {3}'.format(tr_src_name, tr_sym, tr_tgt_name, states))
+        if tr_tgt_state == None:
+            raise Exception('Formato invalido. La transición {0} --{1}--> {2} va a un estado que no está en la lista: {3}'.format(tr_src_name, tr_sym, tr_tgt_name, states))
+
+        tr_src_state.add_transition(tr_sym, tr_tgt_state)
+
+    return Automata(initial_name, finals, symbols, states)
 
 
 def verify_integrity(res):
