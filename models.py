@@ -11,6 +11,7 @@ class Node(object):
 
     NODE_INDEX = 0
 
+    #FIXME Revisar esos nfastates
     def __init__(self, name=None, nfastates=None):
         self.name = name
         if not name:
@@ -26,8 +27,14 @@ class Node(object):
             self.transitions[symbol] = [state]
 
     def is_deterministic(self):
-        symbols = self.transitions.keys()
-        return LAMBDA not in symbols and len(symbols) == len(set(symbols))
+        return self.is_lambda_deterministic() and LAMBDA not in self.transitions.keys()
+
+    def is_lambda_deterministic(self):
+       res = True
+       for s in self.transitions:
+           res = res and len(self.transitions[s]) == 1
+        
+       return res
 
     #FIXME: Posiblemente inútil.
     def transition(self, symbol):
@@ -56,10 +63,13 @@ class UnexpectedSymbolOnStateException(Exception):
     pass
 
 class Automata:
-    def __init__(self, initial, finals, symbols, states):
+    def __init__(self, states, symbols, initial, finals):
         self.initial = initial
         self.current_state = initial
     
+        if not (type(states) == type(symbols) == type(finals) == list):
+            raise TypeError
+
         for s in states:
             if set(s.transitions.keys()) - set(symbols) != set():
                 raise UnexpectedSymbolOnStateException
@@ -106,12 +116,17 @@ class Automata:
     def has_lambda(self):
         return LAMBDA in self.symbols
 
-    def is_deterministic(self):
+    def is_lambda_deterministic(self):
+        res = True
         for state in self.states:
-            for key, tostates in state.transitions.iteritems():
-                if len(tostates) > 1:
-                    return False
-        return True
+            res = res and state.is_lambda_deterministic()
+        return res
+
+    def is_deterministic(self):
+        res = True
+        for state in self.states:
+            res = res and state.is_deterministic()
+        return res
 
     # Métodos para recorrer el autómata con una cadena
     def move_sequence(self, input_sequence):
