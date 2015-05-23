@@ -12,7 +12,7 @@ class Node(object):
     NODE_INDEX = 0
 
     #FIXME Revisar esos nfastates
-    def __init__(self, name=None, nfastates=None):
+    def __init__(self, name = None, nfastates=None):
         self.name = name
         if not name:
             self.name = 'q{0}'.format(Node.NODE_INDEX)
@@ -179,3 +179,55 @@ class Automata:
         return res
 
 
+def minimize(automata):
+    current_partition={}
+    for state in automata.states:
+        current_partition[state] = 1 if state in automata.finals else 0
+
+
+    previous_partition = None
+    while current_partition != previous_partition:
+        current_label = 0
+        last_prev_partition = current_partition[automata.initial]
+        previous_partition = current_partition.copy()
+
+        for state in automata.states:
+            state_partition = previous_partition[state]
+
+            stays_in_partition = True
+
+            for a in automata.symbols:
+                stays_in_partition = stays_in_partition and state_partition == previous_partition[ state.transitions[a][0] ]
+
+            if state != automata.initial and not stays_in_partition:
+                current_label += 1
+            elif state_partition != last_prev_partition:
+                current_label += 1
+                last_prev_partition = state_partition
+
+            current_partition[state] = current_label
+
+    min_states_dict = dict([(x, Node("q{0}".format(x))) for x in set(current_partition.values())])
+
+    min_states = min_states_dict.values()
+    min_initial = None
+    min_finals = []
+
+    for s in automata.states:
+        ms = min_states_dict[ current_partition[s] ]
+        
+        if s == automata.initial:
+            assert(min_initial == None or min_initial == ms)
+            min_initial = ms
+        
+        if s in automata.finals and ms not in min_finals:
+            min_finals.append(ms)
+
+        for a in automata.symbols:
+            target_node = min_states_dict[ current_partition[ s.transitions[a][0] ] ]
+            if ms.transitions.has_key(a):
+                assert(ms.transitions[a][0] == target_node)
+            else:
+                ms.add_transition(a, target_node)
+
+    return Automata(min_states, automata.symbols, min_initial, min_finals)

@@ -5,8 +5,7 @@ from itertools import product
 
 from parsers import load_automata
 from writers import save_automata
-from models import Automata, Node
-from ejercicio_a import minimize
+from models import Automata, Node, minimize
 
 class IncompatibleAlphabetsError(Exception):
     pass
