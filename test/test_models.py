@@ -140,8 +140,8 @@ class TestModels(TestCase):
         self.assertTrue(tested.is_deterministic())
 
     def test_construction_automata__ok(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
@@ -149,7 +149,7 @@ class TestModels(TestCase):
 
         states = [initial, final, other_node]
         symbols = ['a', LAMBDA]
-        automata=Automata(states, symbols, initial, [final])
+        automata = Automata(states, symbols, initial, [final])
 
 
         self.assertEqual(states,  automata.states)
@@ -158,8 +158,8 @@ class TestModels(TestCase):
         self.assertEqual([final], automata.finals)
 
     def test_construction_automata__unexpected_symbol(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
@@ -169,111 +169,125 @@ class TestModels(TestCase):
         symbols = ['a']
 
         with self.assertRaises(UnexpectedSymbolOnStateException):
-            automata=Automata(states, symbols, initial, [final])
+            automata = Automata(states, symbols, initial, [final])
 
     def test_construction_automata__invalid_final(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         initial.add_transition('a', final)
 
         states = [initial, final]
         symbols = ['a']
 
         with self.assertRaises(FinalsNotInStatesException):
-            automata=Automata(states, symbols, initial, [Node()])
+            automata = Automata(states, symbols, initial, [Node()])
 
     def test_construction_automata__extra_final(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         initial.add_transition('a', final)
 
         states = [initial, final]
         symbols = ['a']
 
         with self.assertRaises(FinalsNotInStatesException):
-            automata=Automata(states, symbols, initial, [final, Node()])
+            automata = Automata(states, symbols, initial, [final, Node()])
 
     def test_is_deterministic_automata__lambda_not_det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
         other_node.add_transition(LAMBDA, final)
-        automata=Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
 
         self.assertFalse(automata.is_deterministic())
 
     def test_is_deterministic_automata__not_det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
-        automata=Automata([initial, final, other_node], ['a'], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertFalse(automata.is_deterministic())
 
     def test_is_deterministic_automata__lambda_det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition(LAMBDA, other_node)
         initial.add_transition('a', final)
-        automata=Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
 
         self.assertFalse(automata.is_deterministic())
 
     def test_is_deterministic_automata__det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition('a', final)
-        automata=Automata([initial, final, other_node], ['a'], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertTrue(automata.is_deterministic())
 
     def test_is_lambda_deterministic_automata__lambda_not_det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
         other_node.add_transition(LAMBDA, final)
-        automata=Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
 
         self.assertFalse(automata.is_lambda_deterministic())
 
     def test_is_lambda_deterministic_automata_not_det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
-        automata=Automata([initial, final, other_node], ['a'], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertFalse(automata.is_lambda_deterministic())
 
     def test_is_lambda_deterministic_automata__lambda_det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition(LAMBDA, other_node)
         initial.add_transition('a', final)
-        automata=Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
 
         self.assertTrue(automata.is_lambda_deterministic())
 
     def test_is_lambda_deterministic_automata__det(self):
-        initial=Node()
-        final=Node()
+        initial = Node()
+        final = Node()
         other_node = Node()
         initial.add_transition(LAMBDA, other_node)
         initial.add_transition('a', final)
-        automata=Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
 
         self.assertTrue(automata.is_lambda_deterministic())
 
+    def test_get_by_name__existing(self):
+        q0 = Node("q0")
+        
+        automata = Automata([q0], ['a'], q0, [q0])
+
+        self.assertEqual(q0, automata.state_by_name("q0"))
+
+    def test_get_by_name__existing(self):
+        q0 = Node("q0")
+        
+        automata = Automata([q0], ['a'], q0, [q0])
+
+        with self.assertRaises(ValueError):
+            automata.state_by_name("42")
 
 #    def test_reachable_states_from(self):
 #        q0 = Node("q0")
