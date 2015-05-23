@@ -319,25 +319,25 @@ class TestModels(TestCase):
         self.assertEqual(set([q1, q2]), tested.all_states_reachable_from(q1))
         self.assertEqual(set([q2]), tested.all_states_reachable_from(q2))
    
-    #def test_prune_unreachable_states_simple(self):
-    #    q00 = Node("q00")
-    #    q01 = Node("q01")
-    #    q10 = Node("q10")
-    #    q11 = Node("q11")
+    def test_prune_unreachable_states_simple(self):
+        q00 = Node("q00")
+        q01 = Node("q01")
+        q10 = Node("q10")
+        q11 = Node("q11")
 
-    #    q00.add_transition(0, q11)
-    #    q00.add_transition(1, q11)
-    #    q01.add_transition(0, q10)
-    #    q10.add_transition(0, q01)
-    #    q11.add_transition(0, q00)
+        q00.add_transition(0, q11)
+        q00.add_transition(1, q11)
+        q01.add_transition(0, q10)
+        q10.add_transition(0, q01)
+        q11.add_transition(0, q00)
 
-    #    automata = Automata([q00, q01, q10, q11], [0, 1], q00, [q11])
+        automata = Automata([q00, q01, q10, q11], [0, 1], q00, [q11])
 
-    #    automata.prune_unreachable_states()
+        automata.prune_unreachable_states()
 
-    #    self.assertIn(q00, automata.states())
-    #    self.assertIn(q11, automata.states())
-    #    self.assertEqual(2, len(automata.states()))
+        self.assertIn(q00, automata.states)
+        self.assertIn(q11, automata.states)
+        self.assertEqual(2, len(automata.states))
 
 
 if __name__ == '__main__':
