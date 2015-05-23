@@ -30,27 +30,27 @@ def copy_with_terminal_node(automata):
 
 def add_terminal_node(automata):
     terminal=Node("qT")
-    states = automata.states()
-    finals = set()
+    states = list(automata.states)
+    finals = []
     initial = None
 
     #recorro los nodos, me fijo cuales son inicial/finales 
     # y los modifico para que pasen al trampa cuando corresponda
     for state in states:
         if state in automata.finals:
-            finals.add(state)
+            finals.append(state)
         if state == automata.initial:
             initial = state
-        for symbol in automata.symbols():
-            if state.transitions[symbol] == set():
+        for symbol in automata.symbols:
+            if not state.transitions.has_key(symbol):
                 state.add_transition(symbol, terminal)
 
-    for symbol in automata.symbols():
+    for symbol in automata.symbols:
         terminal.add_transition(symbol, terminal)
 
     states.append(terminal)
 
-    return Automata(initial, finals, automata.symbols(), states)
+    return Automata(states, automata.symbols, initial, finals)
 
 #def add_terminal_node(automata):
 #    """

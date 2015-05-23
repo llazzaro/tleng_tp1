@@ -75,8 +75,15 @@ class Automata:
         self.initial = initial
         self.current_state = initial
     
-        if not (type(states) == type(symbols) == type(finals) == list):
-            raise TypeError
+        if (type(states) != list):
+            raise TypeError("states no es lista")
+
+        if (type(symbols) != list):
+            raise TypeError("symbols no es lista")
+
+        if (type(finals) != list):
+            raise TypeError("finals no es lista")
+
 
         for s in states:
             if set(s.transitions.keys()) - set(symbols) != set():

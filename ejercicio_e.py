@@ -14,6 +14,6 @@ def complemento(archivo_automata1, archivo_automata):
 def afd_complemento(automata):
     aut_con_trampa = add_terminal_node(automata)
 
-    res = Automata(aut_con_trampa.initial, set(aut_con_trampa.states()).difference(set(aut_con_trampa.finals)), aut_con_trampa.symbols(), aut_con_trampa.states())
+    res = Automata(aut_con_trampa.states, aut_con_trampa.symbols, aut_con_trampa.initial, list(set(aut_con_trampa.states) - set(aut_con_trampa.finals)))
     res.prune_unreachable_states()
     return res
