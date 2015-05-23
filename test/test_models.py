@@ -6,8 +6,7 @@ from unittest import TestCase
 
 from models import *
 
-class TestModels(TestCase):
-
+class TestNode(TestCase):
     def test_construccion_node__with_name(self):
         name = "q0"
         n = Node(name)
@@ -139,6 +138,7 @@ class TestModels(TestCase):
 
         self.assertTrue(tested.is_deterministic())
 
+class TestAutomata(TestCase):
     def test_construction_automata__ok(self):
         initial = Node()
         final = Node()
@@ -339,6 +339,10 @@ class TestModels(TestCase):
         self.assertIn(q11, automata.states)
         self.assertEqual(2, len(automata.states))
 
+
+class TestModels(TestCase):
+    def test_minimize(self):
+       pass 
 
 if __name__ == '__main__':
     unittest.main()
