@@ -21,9 +21,14 @@ def load_automata(automata_file):
         symbols.append(symbol.strip('\n'))
 
     initial_line = automata_file.readline()
+    initial = None
     initial_name = initial_line.strip('\n')
     if initial_name not in valid_state_names:
         raise Exception('El estado inicial {0} no es valido. no se encuentra en la lista de estados validos {1}'.format(initial_name, states))
+    
+    for state in states:
+        if state.name == initial_name:
+            initial = state
 
     finals_line = automata_file.readline()
     finals = []
@@ -59,7 +64,7 @@ def load_automata(automata_file):
 
         tr_src_state.add_transition(tr_sym, tr_tgt_state)
 
-    return Automata(initial_name, finals, symbols, states)
+    return Automata(states, symbols, initial, finals)
 
 
 def verify_integrity(res):

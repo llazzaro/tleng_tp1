@@ -72,10 +72,10 @@ class Automata:
 
         for s in states:
             if set(s.transitions.keys()) - set(symbols) != set():
-                raise UnexpectedSymbolOnStateException
+                raise UnexpectedSymbolOnStateException("El estado {0} tiene símbolos que no corresponden al alfabeto {1}: {2}".format(s, symbols, set(s.transitions.keys()) - set(symbols)))
 
         if set(finals) - set(states) != set():
-            raise FinalsNotInStatesException
+            raise FinalsNotInStatesException("Estado(s) final(es) que no pertenece(n) a los estados del autómata: {0}".format(set(finals) - set(states)))
 
         self.finals = finals
 
