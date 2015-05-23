@@ -129,19 +129,20 @@ class Automata:
         return res
 
     # Métodos para recorrer el autómata con una cadena
-    def move_sequence(self, input_sequence):
-        try:
-            for sequence_symbol in input_sequence:
-                self.current_state = list(self.current_state.transitions[sequence_symbol])[0]
+    def accepts(self, string):
+        if not self.is_deterministic():
+            raise TypeError("Sólo sabemos recorrer autómatas determinísticos")
 
-            return self.current_state in self.finals
+        try:
+            current_state = self.initial
+            for symbol in string:
+                current_state = current_state.transitions[symbol][0]
+
+            return current_state in self.finals
         except KeyError:
             return False
         except IndexError:
             return False
-
-    def reset(self):
-        self.current_state = self.initial
 
     # Métodos utilizados para implementar la intersección
     def prune_unreachablestates(self):
