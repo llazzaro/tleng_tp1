@@ -31,10 +31,11 @@ def afd_interseccion(automata1, automata2):
 
     symbols = automata1.symbols
 
+    #Creo un estado para cada par de estados en los dos autómatas originales
     state_product_list = list(product(automata1.states, automata2.states))
     state_product = dict(zip(state_product_list, map(lambda (i, j): Node(name="(" + str(i) + "," + str(j) + ")"), state_product_list)))
 
-    targeted_nodes = set()
+    #Creo transiciones entre los nodos creados
     for (s1, s2) in state_product.keys():
         for a in symbols:
             # Hay uno solo porque son determinísticos.
@@ -42,14 +43,11 @@ def afd_interseccion(automata1, automata2):
                 for target1 in s1.transitions[a]:
                     for target2 in s2.transitions[a]:
                         state_product[(s1, s2)].add_transition(a, state_product[(target1, target2)])
-                        targeted_nodes.add(state_product[(target1, target2)])
 
     intersection_finals = [state_product[(s1, s2)] for (s1, s2) in state_product.keys() if s1 in automata1.finals and s2 in automata2.finals]
 
-    print state_product
-
-    intersection_automata = Automata(state_product[(automata1.initial, automata2.initial)], intersection_finals, symbols, state_product.values())
+    intersection_automata = Automata(state_product.values(), symbols, state_product[(automata1.initial, automata2.initial)], intersection_finals)
     intersection_automata.prune_unreachable_states()
 
-    #return intersection_automata
-    return minimize(intersection_automata)
+    return intersection_automata
+    #return minimize(intersection_automata)

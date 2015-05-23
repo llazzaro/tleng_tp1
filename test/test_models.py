@@ -289,38 +289,55 @@ class TestModels(TestCase):
         with self.assertRaises(ValueError):
             automata.state_by_name("42")
 
-#    def test_reachable_states_from(self):
-#        q0 = Node("q0")
-#        q1 = Node("q1")
-#
-#        q0.add_transition(0, q1)
-#        q0.add_transition(1, q1)
-#        q1.add_transition(0, q0)
-#
-#        automata = Automata([q0, q1], [0, 1], q0, [q1])
-#
-#        self.assertEqual(automata.reachable_states_from(q0), set([q1]))
-#        self.assertEqual(automata.reachable_states_from(q1), set([q0]))
-    
-#    def test_prune_unreachable_states_simple(self):
-#        q00 = Node("q00")
-#        q01 = Node("q01")
-#        q10 = Node("q10")
-#        q11 = Node("q11")
-#
-#        q00.add_transition(0, q11)
-#        q00.add_transition(1, q11)
-#        q01.add_transition(0, q10)
-#        q10.add_transition(0, q01)
-#        q11.add_transition(0, q00)
-#
-#        automata = Automata([q00, q01, q10, q11], [0, 1], q00, [q11])
-#
-#        automata.prune_unreachable_states()
-#
-#        self.assertIn(q00, automata.states())
-#        self.assertIn(q11, automata.states())
-#        self.assertEqual(2, len(automata.states()))
+    def test_reachable_nodes(self):
+        q0 = Node("q0")
+        q1 = Node("q1")
+        q2 = Node("q2")
+
+        q0.add_transition(0, q1)
+        q0.add_transition(1, q2)
+        q2.add_transition(1, q1)
+
+        self.assertEqual(set([q1, q2]), q0.reachable_nodes())
+        self.assertEqual(set([]), q1.reachable_nodes())
+        self.assertEqual(set([q1]), q2.reachable_nodes())
+
+    def test_all_states_reachable_from(self):
+        q0 = Node('q0')
+        q1 = Node('q1')
+        q2 = Node('q2')
+        symbols = ['a', 'b', 'c', 'd', 'e', 'f']
+        
+        q0.add_transition('a', q1)
+        q1.add_transition('b', q2)
+        q1.add_transition('c', q1)
+        q2.add_transition('f', q2)
+
+        tested = Automata([q0, q1, q2], symbols, q0, [q1, q2])
+
+        self.assertEqual(set([q1, q2]), tested.all_states_reachable_from(q0))
+        self.assertEqual(set([q1, q2]), tested.all_states_reachable_from(q1))
+        self.assertEqual(set([q2]), tested.all_states_reachable_from(q2))
+   
+    #def test_prune_unreachable_states_simple(self):
+    #    q00 = Node("q00")
+    #    q01 = Node("q01")
+    #    q10 = Node("q10")
+    #    q11 = Node("q11")
+
+    #    q00.add_transition(0, q11)
+    #    q00.add_transition(1, q11)
+    #    q01.add_transition(0, q10)
+    #    q10.add_transition(0, q01)
+    #    q11.add_transition(0, q00)
+
+    #    automata = Automata([q00, q01, q10, q11], [0, 1], q00, [q11])
+
+    #    automata.prune_unreachable_states()
+
+    #    self.assertIn(q00, automata.states())
+    #    self.assertIn(q11, automata.states())
+    #    self.assertEqual(2, len(automata.states()))
 
 
 if __name__ == '__main__':

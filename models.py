@@ -36,6 +36,14 @@ class Node(object):
         
        return res
 
+    def reachable_nodes(self):
+        res = set()
+        for a in self.transitions.keys():
+            for s in self.transitions[a]:
+                res.add(s)
+
+        return res
+
     #FIXME: Posiblemente inútil.
     def transition(self, symbol):
         for state in self.transitions[symbol]:
@@ -145,17 +153,20 @@ class Automata:
             return False
 
     # Métodos utilizados para implementar la intersección
-    def prune_unreachablestates(self):
+    def prune_unreachable_states(self):
         """
             Actualiza la lista de estados para que queden sólo los alcanzables desde el inicial
             (En la construcción de la intersección aparecen muchos estados inalcanzables)
         """
-        self.states = self.all_reachablestates_from(self.initial)
-        self.states.add(self.initial)
-        self.finals = self.finals & self.states
+        reachable_states = self.all_states_reachable_from(self.initial)
+        reachable_states.add(self.initial)
+        reachable_finals = set(self.finals) & reachable_states
 
-    def all_reachablestates_from(self, state):
-        res = self.reachablestates_from(state)
+        self.states = list(reachable_states)
+        self.finals = list(reachable_finals)
+
+    def all_states_reachable_from(self, state):
+        res = state.reachable_nodes()
         res_prev = set()
 
         while len(res) > len(res_prev):
@@ -163,14 +174,8 @@ class Automata:
             res_prev = res
             for s in res_prev:
                 if s not in res_menor:  # Módica optimización
-                    res = res.union(self.reachablestates_from(s))
+                    res = res.union(s.reachable_nodes())
 
         return res
 
-    def reachablestates_from(self, state):
-        res = set()
-        for a in self.symbols:
-            for s in state.transitions[a]:
-                res.add(s)
 
-        return res
