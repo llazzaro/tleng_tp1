@@ -341,8 +341,55 @@ class TestAutomata(TestCase):
 
 
 class TestModels(TestCase):
-    def test_minimize(self):
-       pass 
+    def test_minimize__ejemplo_clase(self):
+        q0 = Node('q0')
+        q1 = Node('q1')
+        q2 = Node('q2')
+        q3 = Node('q3')
+        q4 = Node('q4')
+        q5 = Node('q5')
+
+        q0.add_transition('a', q1)
+        q0.add_transition('b', q0)
+        q1.add_transition('a', q2)
+        q1.add_transition('b', q0)
+        q2.add_transition('a', q3)
+        q2.add_transition('b', q0)
+        q3.add_transition('a', q3)
+        q3.add_transition('b', q4)
+        q4.add_transition('a', q5)
+        q4.add_transition('b', q4)
+        q5.add_transition('a', q3)
+        q5.add_transition('b', q4)
+
+        symbols = ['a', 'b']
+        automata = Automata([q0, q1, q2, q3, q4, q5], symbols, q0, [q3, q4, q5])
+
+        minimized = minimize(automata)
+        self.assertEqual(automata.symbols, minimized.symbols)
+        self.assertEqual(4, len(minimized.states))
+
+        # Assert implícito de que estas líneas no tiran excepciones
+        q0 = minimized.state_by_name("q0")
+        q1 = minimized.state_by_name("q1")
+        q2 = minimized.state_by_name("q2")
+        q3 = minimized.state_by_name("q3")
+
+        self.assertEqual(q0, minimized.initial)
+        self.assertEqual([q3], minimized.finals)
+
+        self.assertEqual(symbols, q0.transitions.keys())
+        self.assertEqual([q1], q0.transitions['a'])
+        self.assertEqual([q0], q0.transitions['b'])
+        self.assertEqual(symbols, q1.transitions.keys())
+        self.assertEqual([q2], q1.transitions['a'])
+        self.assertEqual([q0], q1.transitions['b'])
+        self.assertEqual(symbols, q2.transitions.keys())
+        self.assertEqual([q3], q2.transitions['a'])
+        self.assertEqual([q0], q2.transitions['b'])
+        self.assertEqual(symbols, q3.transitions.keys())
+        self.assertEqual([q3], q3.transitions['a'])
+        self.assertEqual([q3], q3.transitions['b'])
 
 if __name__ == '__main__':
     unittest.main()
