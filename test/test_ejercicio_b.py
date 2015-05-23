@@ -32,6 +32,7 @@ class TestEjercicioA(TestCase):
         self.assertFalse(tested.accepts("d"))
         self.assertFalse(tested.accepts("e"))
         self.assertFalse(tested.accepts("f"))
+        self.assertFalse(tested.accepts("Z"))
         self.assertFalse(tested.accepts("abb"))
         self.assertFalse(tested.accepts("af"))
         self.assertFalse(tested.accepts("acca"))
