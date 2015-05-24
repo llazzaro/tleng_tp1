@@ -5,8 +5,7 @@ from unittest import TestCase
 from StringIO import StringIO
 
 from parsers import regex_to_automata, load_automata
-from ejercicio_a import minimize
-from models import LAMBDA
+from models import LAMBDA, minimize
 
 
 class TestParseAutomata(TestCase):

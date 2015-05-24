@@ -3,8 +3,8 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from models import Node, Automata, LAMBDA
-from ejercicio_a import minimize, nfa_to_dfa
+from models import Node, Automata, LAMBDA, minimize
+from ejercicio_a import nfa_to_dfa
 from parsers import load_automata
 
 
@@ -27,12 +27,15 @@ class TestEjercicioA(TestCase):
 
         finals = [state_q2]
 
-        nfa_automata = Automata(initial, finals)
+        states = [initial, state_q1, state_q2]
+        symbols = ['0', '1']
+
+        nfa_automata = Automata(states, symbols, initial, finals)
 
         dfa_automata = nfa_to_dfa(nfa_automata)
 
-        self.assertEquals(dfa_automata.symbols(), nfa_automata.symbols())
-        self.assertEquals(len(dfa_automata.states()), 3)
+        self.assertEquals(set(dfa_automata.symbols), set(nfa_automata.symbols))
+        self.assertEquals(len(dfa_automata.states), 3)
         self.assertTrue(dfa_automata.is_deterministic())
         dfa_state_q0q1 = dfa_automata.initial.transition('0')
         dfa_state_q0q2 = dfa_state_q0q1.transition('1')
@@ -72,13 +75,16 @@ class TestEjercicioA(TestCase):
 
         finals = [initial, state_d]
 
-        not_minimized = Automata(initial, finals)
+        states = [initial, state_d, state_e]
+        symbols = ['0', '1']
+
+        not_minimized = Automata(states, symbols, initial, finals)
 
         minimized = minimize(not_minimized)
 
-        self.assertEquals(len(minimized.states()), 2)
-        self.assertTrue(LAMBDA not in minimized.symbols())
-        self.assertEquals(minimized.symbols(), not_minimized.symbols())
+        self.assertEquals(len(minimized.states), 2)
+        self.assertTrue(LAMBDA not in minimized.symbols)
+        self.assertEquals(minimized.symbols, not_minimized.symbols)
         self.assertEquals(minimized.initial.transition('0'), minimized.initial)
         other_node = minimized.initial.transition('1')
         self.assertEquals(minimized.initial.transition('1').transition('0'), minimized.initial)
@@ -112,8 +118,8 @@ class TestEjercicioA(TestCase):
         # with open("files/wikipedia_min.aut", "w") as f:
         #    save_automata(minimized, f)
 
-        self.assertEquals(len(minimized.states()), 2)
-        self.assertTrue(LAMBDA not in minimized.symbols())
+        self.assertEquals(len(minimized.states), 2)
+        self.assertTrue(LAMBDA not in minimized.symbols)
         self.assertTrue(minimized.initial.transition('0') == minimized.initial)
         self.assertTrue(minimized.initial.transition('1') in minimized.finals)
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
@@ -143,9 +149,9 @@ class TestEjercicioA(TestCase):
         automata = load_automata(StringIO(input_automata))
         minimized = minimize(automata)
 
-        self.assertEquals(len(minimized.states()), 5)
+        self.assertEquals(len(minimized.states), 5)
         self.assertEquals(len(minimized.finals), 1)
-        self.assertTrue(LAMBDA not in minimized.symbols())
+        self.assertTrue(LAMBDA not in minimized.symbols)
 
         self.assertTrue(minimized.initial.transition('0').transition('1') in minimized.finals)
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
@@ -157,13 +163,13 @@ class TestEjercicioA(TestCase):
 
         automata = load_automata(input_file)
 
-        self.assertEquals(len(automata.states()), 12)
+        self.assertEquals(len(automata.states), 12)
 
         minimized = minimize(automata)
 
-        self.assertEquals(minimized.symbols(), automata.symbols())
-        self.assertEquals(len(minimized.states()), 8)
-        self.assertTrue(LAMBDA not in minimized.symbols())
+        self.assertEquals(minimized.symbols, automata.symbols)
+        self.assertEquals(len(minimized.states), 8)
+        self.assertTrue(LAMBDA not in minimized.symbols)
 
 
 if __name__ == '__main__':

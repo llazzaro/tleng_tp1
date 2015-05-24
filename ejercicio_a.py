@@ -3,7 +3,6 @@
 
 import itertools
 from Queue import Queue
-from collections import defaultdict
 from models import Automata, LAMBDA, Node
 from parsers import regex_to_automata
 from writers import save_automata
@@ -34,7 +33,7 @@ def add_terminal_node(automata):
     finals = []
     initial = None
 
-    #recorro los nodos, me fijo cuales son inicial/finales 
+    #recorro los nodos, me fijo cuales son inicial/finales
     # y los modifico para que pasen al trampa cuando corresponda
     for state in states:
         if state in automata.finals:
@@ -57,11 +56,11 @@ def add_terminal_node(automata):
 #        CUIDADO: modifica la estructura del automata parametro
 #    """
 #    terminal=Node()
-#    for state in automata.states():
-#        for symbol in automata.symbols():
+#    for state in automata.states:
+#        for symbol in automata.symbols:
 #            state.add_transition(symbol, terminal)
 #
-#    for symbol in automata.symbols():
+#    for symbol in automata.symbols:
 #        terminal.add_transition(symbol, terminal)
 #
 #    return Automata(automata.initial, automata.finals)
@@ -69,36 +68,39 @@ def add_terminal_node(automata):
 
 def remover_nodos_redundantes(automata):
     to_remove = set()
-    for state in automata.states():
+    for state in automata.states:
         recheable_states = list(itertools.chain(*state.transitions.values()))
         if all(map(lambda to_state: state == to_state, recheable_states)) and state not in automata.finals:
             to_remove.add(state)
 
     if to_remove:
-        for state in automata.states():
-            for symbol in automata.symbols():
+        for state in automata.states:
+            for symbol in automata.symbols:
                 to_states = state.transitions[symbol]
                 state.transitions[symbol] = to_states - to_remove
 
     return Automata(automata.initial, automata.finals)
 
 
-
 def nfa_to_dfa(automata):
-    initial = Node(nfa_states=lambda_closure(set([automata.initial]), automata))
+    initial = Node(nfastates=lambda_closure(set([automata.initial]), automata))
     states_queue = Queue()
     states_queue.put(initial)
     used_states = set([initial])
+    symbols = []
+    states = []
     # aca construimos el nuevo delta
     while not states_queue.empty():
         dfa_state = states_queue.get()
-        for symbol in automata.symbols():
-            state_closure=lambda_closure(automata.move_set(dfa_state.nfa_states, symbol), automata)
+        for symbol in automata.symbols:
+            symbols.append(symbol)
+            state_closure=lambda_closure(automata.move_set(dfa_state.nfastates, symbol), automata)
 
-            new_dfa_state=Node(nfa_states=state_closure)
+            new_dfa_state=Node(nfastates=state_closure)
+            states.append(new_dfa_state)
             new = True
             for used_state in used_states:
-                if state_closure == used_state.nfa_states:
+                if state_closure == used_state.nfastates:
                     new_dfa_state = used_state
                     new = False
                     break
@@ -108,11 +110,11 @@ def nfa_to_dfa(automata):
             dfa_state.add_transition(symbol, new_dfa_state)
             used_states.add(new_dfa_state)
 
-    res = Automata(initial, [])
-    for state in res.states():
-        for nfa_state in state.nfa_states:
+    res = Automata(list(set(states)), list(set(symbols)), initial, [])
+    for state in res.states:
+        for nfa_state in state.nfastates:
             if nfa_state in automata.finals:
-                res.finals.add(state)
+                res.finals.append(state)
 
     return res
 
