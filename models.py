@@ -1,9 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/python
 
-from collections import defaultdict
-from Queue import Queue
-
 LAMBDA = '@'
 
 
@@ -11,8 +8,8 @@ class Node(object):
 
     NODE_INDEX = 0
 
-    #FIXME Revisar esos nfastates
-    def __init__(self, name = None, nfastates=None):
+    # FIXME Revisar esos nfastates
+    def __init__(self, name=None, nfastates=None):
         self.name = name
         if not name:
             self.name = 'q{0}'.format(Node.NODE_INDEX)
@@ -21,7 +18,7 @@ class Node(object):
         self.transitions = {}
 
     def add_transition(self, symbol, state):
-        if self.transitions.has_key(symbol):
+        if symbol in self.transitions:
             self.transitions[symbol].append(state)
         else:
             self.transitions[symbol] = [state]
@@ -30,11 +27,11 @@ class Node(object):
         return self.is_lambda_deterministic() and LAMBDA not in self.transitions.keys()
 
     def is_lambda_deterministic(self):
-       res = True
-       for s in self.transitions:
-           res = res and len(self.transitions[s]) == 1
+        res = True
+        for s in self.transitions:
+            res = res and len(self.transitions[s]) == 1
 
-       return res
+        return res
 
     def reachable_nodes(self):
         res = set()
@@ -67,8 +64,10 @@ class Node(object):
 class FinalsNotInStatesException(Exception):
     pass
 
+
 class UnexpectedSymbolOnStateException(Exception):
     pass
+
 
 class Automata:
     def __init__(self, states, symbols, initial, finals):
@@ -189,7 +188,6 @@ def minimize(automata):
     current_partition={}
     for state in automata.states:
         current_partition[state] = 1 if state in automata.finals else 0
-
 
     previous_partition = None
     while current_partition != previous_partition:

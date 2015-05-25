@@ -6,6 +6,7 @@ from StringIO import StringIO
 from models import Node, Automata, LAMBDA, minimize
 from ejercicio_a import nfa_to_dfa
 from parsers import load_automata
+from writers import save_dot
 
 
 class TestEjercicioA(TestCase):
@@ -56,7 +57,7 @@ class TestEjercicioA(TestCase):
         self.assertTrue(dfa_state_q0q2 in dfa_automata.finals)
         self.assertEquals(len(dfa_automata.finals), 1)
 
-    def test_minize_example_from_hopcroft(self):
+    def test_minimize_example_from_hopcroft(self):
         """
             basado en la figura 4.10 del libro
         """
@@ -81,6 +82,8 @@ class TestEjercicioA(TestCase):
         not_minimized = Automata(states, symbols, initial, finals)
 
         minimized = minimize(not_minimized)
+
+        save_dot(minimized, open('hopcroft_410.dot', 'w'))
 
         self.assertEquals(len(minimized.states), 2)
         self.assertTrue(LAMBDA not in minimized.symbols)
