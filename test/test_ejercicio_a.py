@@ -42,9 +42,6 @@ class TestEjercicioA(TestCase):
         dfa_state_q0q2 = dfa_state_q0q1.transition('1')
 
         self.assertEquals(dfa_automata.initial.transition('1'), dfa_automata.initial)
-        self.assertEquals(dfa_automata.initial.nfa_states, set([initial]))
-        self.assertEquals(dfa_state_q0q1.nfa_states, set([initial, state_q1]))
-        self.assertEquals(dfa_state_q0q2.nfa_states, set([state_q2, initial]))
 
         self.assertEquals(dfa_state_q0q1.transition('0'), dfa_state_q0q1)
         self.assertEquals(dfa_state_q0q1.transition('1'), dfa_state_q0q2)

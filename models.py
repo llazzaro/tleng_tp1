@@ -9,11 +9,10 @@ class Node(object):
     NODE_INDEX = 0
 
     # FIXME Revisar esos nfastates
-    def __init__(self, name=None, nfastates=None):
+    def __init__(self, name=None):
         self.name = name
         if not name:
             self.name = 'q{0}'.format(Node.NODE_INDEX)
-        self.nfastates = nfastates
         Node.NODE_INDEX += 1
         self.transitions = {}
 
@@ -41,15 +40,10 @@ class Node(object):
 
         return res
 
-    #FIXME: Posiblemente inútil.
+    # FIXME: Posiblemente inútil.
     def transition(self, symbol):
         for state in self.transitions[symbol]:
             return state
-
-    def __eq__(self, other):
-        if type(self) != type(other):
-            return False
-        return self.name == other.name or (self.nfastates is not None and self.nfastates == other.nfastates)
 
     def __hash__(self):
         return id(self)
