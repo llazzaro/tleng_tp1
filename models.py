@@ -8,7 +8,6 @@ class Node(object):
 
     NODE_INDEX = 0
 
-    # FIXME Revisar esos nfastates
     def __init__(self, name=None):
         self.name = name
         if not name:
