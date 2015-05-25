@@ -1,4 +1,4 @@
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 #!/usr/bin/python
 
 import unittest
@@ -41,7 +41,7 @@ class TestNode(TestCase):
 
         tested.add_transition(s, target1)
         tested.add_transition(s, target2)
-        
+
         self.assertEqual(set([target1, target2]), set(tested.transitions[s]))
 
     def test_is_deterministic_node__lambda_not_det(self):
@@ -163,7 +163,7 @@ class TestAutomata(TestCase):
         other_node = Node()
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
-        other_node.add_transition(LAMBDA, final)
+        other_node.add_transition('z', final)
 
         states = [initial, final, other_node]
         symbols = ['a']
@@ -276,14 +276,14 @@ class TestAutomata(TestCase):
 
     def test_get_by_name__existing(self):
         q0 = Node("q0")
-        
+
         automata = Automata([q0], ['a'], q0, [q0])
 
         self.assertEqual(q0, automata.state_by_name("q0"))
 
     def test_get_by_name__existing(self):
         q0 = Node("q0")
-        
+
         automata = Automata([q0], ['a'], q0, [q0])
 
         with self.assertRaises(ValueError):
@@ -307,7 +307,7 @@ class TestAutomata(TestCase):
         q1 = Node('q1')
         q2 = Node('q2')
         symbols = ['a', 'b', 'c', 'd', 'e', 'f']
-        
+
         q0.add_transition('a', q1)
         q1.add_transition('b', q2)
         q1.add_transition('c', q1)
@@ -318,7 +318,7 @@ class TestAutomata(TestCase):
         self.assertEqual(set([q1, q2]), tested.all_states_reachable_from(q0))
         self.assertEqual(set([q1, q2]), tested.all_states_reachable_from(q1))
         self.assertEqual(set([q2]), tested.all_states_reachable_from(q2))
-   
+
     def test_prune_unreachable_states_simple(self):
         q00 = Node("q00")
         q01 = Node("q01")

@@ -33,7 +33,7 @@ class Node(object):
        res = True
        for s in self.transitions:
            res = res and len(self.transitions[s]) == 1
-        
+
        return res
 
     def reachable_nodes(self):
@@ -74,7 +74,7 @@ class Automata:
     def __init__(self, states, symbols, initial, finals):
         self.initial = initial
         self.current_state = initial
-    
+
         if (type(states) != list):
             raise TypeError("states no es lista")
 
@@ -84,9 +84,8 @@ class Automata:
         if (type(finals) != list):
             raise TypeError("finals no es lista")
 
-
         for s in states:
-            if set(s.transitions.keys()) - set(symbols) != set():
+            if set(s.transitions.keys()) - set(symbols).union(LAMBDA) != set():
                 raise UnexpectedSymbolOnStateException("El estado {0} tiene símbolos que no corresponden al alfabeto {1}: {2}".format(s, symbols, set(s.transitions.keys()) - set(symbols)))
 
         if set(finals) - set(states) != set():
@@ -222,11 +221,11 @@ def minimize(automata):
 
     for s in automata.states:
         ms = min_states_dict[ current_partition[s] ]
-        
+
         if s == automata.initial:
             assert(min_initial == None or min_initial == ms)
             min_initial = ms
-        
+
         if s in automata.finals and ms not in min_finals:
             min_finals.append(ms)
 
