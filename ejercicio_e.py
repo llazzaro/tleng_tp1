@@ -3,8 +3,7 @@
 
 from parsers import load_automata
 from writers import save_automata
-from models import Automata, Node
-from ejercicio_a import add_terminal_node
+from models import *
 
 def complemento(archivo_automata1, archivo_automata):
     automata = load_automata(archivo_automata1)
