@@ -228,3 +228,29 @@ def minimize(automata):
                 ms.add_transition(a, target_node)
 
     return Automata(min_states, automata.symbols, min_initial, min_finals)
+
+
+def add_terminal_node(automata):
+    terminal=Node("qT")
+    states = list(automata.states)
+    finals = []
+    initial = None
+
+    # recorro los nodos, me fijo cuales son inicial/finales
+    # y los modifico para que pasen al trampa cuando corresponda
+    for state in states:
+        if state in automata.finals:
+            finals.append(state)
+        if state == automata.initial:
+            initial = state
+        for symbol in automata.symbols:
+            if symbol not in state.transitions:
+                state.add_transition(symbol, terminal)
+
+    for symbol in automata.symbols:
+        terminal.add_transition(symbol, terminal)
+
+    states.append(terminal)
+
+    return Automata(states, automata.symbols, initial, finals)
+

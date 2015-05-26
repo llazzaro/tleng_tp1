@@ -391,5 +391,42 @@ class TestModels(TestCase):
         self.assertEqual([q3], q3.transitions['a'])
         self.assertEqual([q3], q3.transitions['b'])
 
+    def test_add_terminal_node__ejemplo_simple(self):
+        q0 = Node('q0')
+        q1 = Node('q1')
+        q2 = Node('q2')
+
+        q0.add_transition('a', q1)
+        q1.add_transition('b', q2)
+        q2.add_transition('a', q2)
+        q2.add_transition('b', q2)
+
+        symbols = ['a', 'b']
+        automata = Automata([q0, q1, q2], symbols, q0, [q2])
+
+        with_terminal_node = add_terminal_node(automata)
+
+        self.assertEqual(automata.symbols, with_terminal_node.symbols)
+        self.assertEqual(len(automata.states) + 1, len(with_terminal_node.states))
+
+        q0T = with_terminal_node.state_by_name("q0")
+        q1T = with_terminal_node.state_by_name("q1")
+        q2T = with_terminal_node.state_by_name("q2")
+        qT = with_terminal_node.state_by_name("qT")
+
+        self.assertEqual(symbols, q0T.transitions.keys())
+        self.assertEqual([q1T], q0T.transitions['a'])
+        self.assertEqual([qT], q0T.transitions['b'])
+        self.assertEqual(symbols, q1T.transitions.keys())
+        self.assertEqual([qT], q1T.transitions['a'])
+        self.assertEqual([q2T], q1T.transitions['b'])
+        self.assertEqual(symbols, q2T.transitions.keys())
+        self.assertEqual([q2T], q2T.transitions['a'])
+        self.assertEqual([q2T], q2T.transitions['b'])
+        self.assertEqual(symbols, qT.transitions.keys())
+        self.assertEqual([qT], qT.transitions['a'])
+        self.assertEqual([qT], qT.transitions['b'])
+
+
 if __name__ == '__main__':
     unittest.main()
