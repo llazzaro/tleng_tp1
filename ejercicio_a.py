@@ -115,7 +115,7 @@ def nfa_to_dfa(automata):
     res = Automata(list(set(states)), automata.symbols, initial, [])
     for state in res.states:
         for nfa_state in nfa_states[state]:
-            if nfa_state in automata.finals:
+            if nfa_state in automata.finals and state not in res.finals:
                 res.finals.append(state)
 
     return res

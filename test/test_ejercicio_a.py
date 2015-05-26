@@ -56,11 +56,15 @@ class TestEjercicioA(TestCase):
         nfa_automata = Automata([initial, state_2, state_3, state_4, state_5, state_6], ['a', 'b'], initial, [state_4, state_6])
         dfa_automata = nfa_to_dfa(nfa_automata)
 
-        import ipdb
-        ipdb.set_trace()
         self.assertEquals(len(dfa_automata.states), 9)
         # revisar
         self.assertEquals(len(dfa_automata.finals), 5)
+        self.assertTrue(dfa_automata.initial.transition('a') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b').transition('b') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('a') not in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('a').transition('b') in dfa_automata.finals)
 
     def test_convert_nfa_to_dfa_from_hopcroft(self):
         """
