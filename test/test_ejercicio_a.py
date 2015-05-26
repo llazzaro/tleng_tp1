@@ -11,6 +11,57 @@ from writers import save_dot
 
 class TestEjercicioA(TestCase):
 
+    def test_simple_nfa_to_dfa(self):
+        initial = Node(name='1')
+        state_2 = Node(name='2')
+        state_3 = Node(name='3')
+
+        initial.add_transition('a', state_2)
+        state_2.add_transition(LAMBDA, initial)
+        state_2.add_transition('b', state_3)
+
+        nfa_automata = Automata([initial, state_2, state_3], ['a', 'b'], initial, [state_3])
+
+        dfa_automata = nfa_to_dfa(nfa_automata)
+
+        self.assertTrue(dfa_automata.is_deterministic())
+        self.assertFalse(nfa_automata.is_deterministic())
+        self.assertEquals(len(dfa_automata.states), 4)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('a') == dfa_automata.initial.transition('a'))
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('a') not in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('a').transition('b') in dfa_automata.finals)
+
+    def test_simple_nfa_to_dfa_other(self):
+        """
+            ultimo ejemplo de http://www.cs.umd.edu/class/spring2011/cmsc330/s4/nfa-to-dfa.pdf
+        """
+        initial = Node(name='1')
+        state_2 = Node(name='2')
+        state_3 = Node(name='3')
+        state_4 = Node(name='4')
+        state_5 = Node(name='5')
+        state_6 = Node(name='6')
+
+        initial.add_transition(LAMBDA, state_2)
+        initial.add_transition(LAMBDA, state_5)
+        state_2.add_transition('a', state_3)
+        state_3.add_transition('b', state_4)
+        state_4.add_transition('b', state_5)
+        state_5.add_transition('a', state_6)
+        state_5.add_transition('a', state_2)
+        state_6.add_transition('b', state_6)
+        state_6.add_transition(LAMBDA, state_2)
+
+        nfa_automata = Automata([initial, state_2, state_3, state_4, state_5, state_6], ['a', 'b'], initial, [state_4, state_6])
+        dfa_automata = nfa_to_dfa(nfa_automata)
+
+        import ipdb
+        ipdb.set_trace()
+        self.assertEquals(len(dfa_automata.states), 9)
+        # revisar
+        self.assertEquals(len(dfa_automata.finals), 5)
+
     def test_convert_nfa_to_dfa_from_hopcroft(self):
         """
             el automata corresponde a la figura 2.9 del libro.
@@ -53,6 +104,44 @@ class TestEjercicioA(TestCase):
 
         self.assertTrue(dfa_state_q0q2 in dfa_automata.finals)
         self.assertEquals(len(dfa_automata.finals), 1)
+
+    def test_convert_nfa_to_dfa_con_lambda(self):
+        """
+            el ejemplo lo saque de aca
+            http://condor.depaul.edu/glancast/444class/docs/nfa2dfa.html
+        """
+        initial = Node(name='1')
+        state_2 = Node(name='2')
+        state_3 = Node(name='3')
+        state_4 = Node(name='4')
+        state_5 = Node(name='5')
+
+        initial.add_transition(LAMBDA, state_2)
+        initial.add_transition('a', state_3)
+        state_2.add_transition('a', state_5)
+        state_2.add_transition('a', state_4)
+        state_3.add_transition('b', state_4)
+        state_4.add_transition('a', state_5)
+        state_4.add_transition('b', state_5)
+
+        nfa_automata = Automata([initial, state_2, state_3, state_4, state_5], ['a', 'b'], initial, [state_5])
+
+        dfa_automata = nfa_to_dfa(nfa_automata)
+
+        self.assertEquals(len(dfa_automata.states), 5)
+        self.assertEquals(dfa_automata.symbols, nfa_automata.symbols)
+        self.assertEquals(len(dfa_automata.finals), 3)
+        self.assertFalse(dfa_automata.has_lambda())
+        self.assertTrue(dfa_automata.is_deterministic())
+        self.assertTrue(dfa_automata.initial.transition('a') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('b') not in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('a') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.initial.transition('a') != dfa_automata.initial.transition('a').transition('a'))
+        self.assertTrue(dfa_automata.initial.transition('a') != dfa_automata.initial.transition('a').transition('b'))
+        self.assertTrue(dfa_automata.initial.transition('a').transition('a') != dfa_automata.initial.transition('a').transition('b'))
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('a') == dfa_automata.initial.transition('a').transition('a'))
+        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b') == dfa_automata.initial.transition('a').transition('a'))
 
     def test_minimize_example_from_hopcroft(self):
         """
