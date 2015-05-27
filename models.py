@@ -184,25 +184,25 @@ def minimize(automata):
 
     previous_partition = None
     while current_partition != previous_partition:
-        current_label = 0
         last_prev_partition = current_partition[automata.initial]
         previous_partition = current_partition.copy()
 
+        process = {}
         for state in automata.states:
-            state_partition = previous_partition[state]
-
-            stays_in_partition = True
+            process[state] = [previous_partition[state]]
 
             for a in automata.symbols:
-                stays_in_partition = stays_in_partition and state_partition == previous_partition[ state.transitions[a][0] ]
+                process[state].append(previous_partition[state.transition(a)])
 
-            if state != automata.initial and not stays_in_partition:
+        current_label = 0
+        partition_label = {}
+        for state in automata.states:
+            part_list = str(process[state]) # En realidad debiera hacer un implode, pero para el caso es lo mismo
+            if part_list not in partition_label.keys():
+                partition_label[part_list] = current_label
                 current_label += 1
-            elif state_partition != last_prev_partition:
-                current_label += 1
-                last_prev_partition = state_partition
 
-            current_partition[state] = current_label
+            current_partition[state] = partition_label[part_list]
 
     min_states_dict = dict([(x, Node("q{0}".format(x))) for x in set(current_partition.values())])
 
