@@ -26,8 +26,9 @@ def lambda_closure(from_states, automata):
 
 
 def nfa_to_dfa(automata):
+    node_index = 0
     nfa_states = {}
-    initial = Node()
+    initial = Node("q{0}".format(node_index))
     nfa_states[initial] = lambda_closure(set([automata.initial]), automata)
     states_queue = Queue()
     states_queue.put(initial)
@@ -46,8 +47,9 @@ def nfa_to_dfa(automata):
                     break
 
             if new:
-                # la clausua es nueva, creo un nuevo estado.
-                new_dfa_state=Node()
+                # la clausura es nueva, creo un nuevo estado.
+                node_index += 1
+                new_dfa_state=Node("q{0}".format(node_index))
                 nfa_states[new_dfa_state] = state_closure
                 states.append(new_dfa_state)
                 states_queue.put(new_dfa_state)
