@@ -100,23 +100,11 @@ class Automata:
                         res.add(node)
         return res
 
-    #def add_symbol(self, symbol):
-    #    self.symbols.add(symbol)
-
-    #def add_state(self, state):
-    #    self.state.add(state)
-
     def state_by_name(self, state_name):
         for state in self.states:
             if state.name == state_name:
                 return state
         raise ValueError('State not found')
-
-    #def set_final_state(self, state_name):
-    #    for state in self.state:
-    #        if state.name == state_name:
-    #            self.finals.add(state)
-    #            return
 
     def has_lambda(self):
         return LAMBDA in self.symbols
