@@ -196,43 +196,6 @@ class TestEjercicioA(TestCase):
         self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('a') == dfa_automata.initial.transition('a').transition('a'))
         self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b') == dfa_automata.initial.transition('a').transition('a'))
 
-    def test_minimize_example_from_hopcroft(self):
-        """
-            basado en la figura 4.10 del libro
-        """
-        initial = Node(name='c')
-        state_d = Node(name='d')
-        state_e = Node(name='e')
-
-        initial.add_transition('0', state_d)
-        initial.add_transition('1', state_e)
-
-        state_d.add_transition('0', state_d)
-        state_d.add_transition('1', state_e)
-
-        state_e.add_transition('1', state_e)
-        state_e.add_transition('0', initial)
-
-        finals = [initial, state_d]
-
-        states = [initial, state_d, state_e]
-        symbols = ['0', '1']
-
-        not_minimized = Automata(states, symbols, initial, finals)
-
-        minimized = minimize(not_minimized)
-
-        save_dot(minimized, open('hopcroft_410.dot', 'w'))
-
-        self.assertEquals(len(minimized.states), 2)
-        self.assertTrue(LAMBDA not in minimized.symbols)
-        self.assertEquals(minimized.symbols, not_minimized.symbols)
-        self.assertEquals(minimized.initial.transition('0'), minimized.initial)
-        other_node = minimized.initial.transition('1')
-        self.assertEquals(minimized.initial.transition('1').transition('0'), minimized.initial)
-        self.assertEquals(minimized.initial.transition('1'), other_node)
-        self.assertEquals(minimized.initial.transition('1').transition('1'), other_node)
-
     def test_wikipedia_example_minimization(self):
         input_automata = '\t'.join(['a', 'b', 'c', 'd', 'e', 'f']) + '\n'
         input_automata += '\t'.join(['0', '1']) + '\n'

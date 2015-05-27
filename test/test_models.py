@@ -341,6 +341,43 @@ class TestAutomata(TestCase):
 
 
 class TestModels(TestCase):
+    def test_add_terminal_node__ejemplo_simple(self):
+        q0 = Node('q0')
+        q1 = Node('q1')
+        q2 = Node('q2')
+
+        q0.add_transition('a', q1)
+        q1.add_transition('b', q2)
+        q2.add_transition('a', q2)
+        q2.add_transition('b', q2)
+
+        symbols = ['a', 'b']
+        automata = Automata([q0, q1, q2], symbols, q0, [q2])
+
+        with_terminal_node = add_terminal_node(automata)
+
+        self.assertEqual(automata.symbols, with_terminal_node.symbols)
+        self.assertEqual(len(automata.states) + 1, len(with_terminal_node.states))
+
+        q0T = with_terminal_node.state_by_name("q0")
+        q1T = with_terminal_node.state_by_name("q1")
+        q2T = with_terminal_node.state_by_name("q2")
+        qT = with_terminal_node.state_by_name("qT")
+
+        self.assertEqual(symbols, q0T.transitions.keys())
+        self.assertEqual([q1T], q0T.transitions['a'])
+        self.assertEqual([qT], q0T.transitions['b'])
+        self.assertEqual(symbols, q1T.transitions.keys())
+        self.assertEqual([qT], q1T.transitions['a'])
+        self.assertEqual([q2T], q1T.transitions['b'])
+        self.assertEqual(symbols, q2T.transitions.keys())
+        self.assertEqual([q2T], q2T.transitions['a'])
+        self.assertEqual([q2T], q2T.transitions['b'])
+        self.assertEqual(symbols, qT.transitions.keys())
+        self.assertEqual([qT], qT.transitions['a'])
+        self.assertEqual([qT], qT.transitions['b'])
+
+class TestMinimize(TestCase):
     def test_minimize__ejemplo_clase(self):
         q0 = Node('q0')
         q1 = Node('q1')
@@ -391,41 +428,42 @@ class TestModels(TestCase):
         self.assertEqual([q3], q3.transitions['a'])
         self.assertEqual([q3], q3.transitions['b'])
 
-    def test_add_terminal_node__ejemplo_simple(self):
-        q0 = Node('q0')
-        q1 = Node('q1')
-        q2 = Node('q2')
+    def test_minimize__example_from_hopcroft(self):
+        """
+            basado en la figura 4.10 del libro
+        """
+        state_c = Node(name='c')
+        state_d = Node(name='d')
+        state_e = Node(name='e')
 
-        q0.add_transition('a', q1)
-        q1.add_transition('b', q2)
-        q2.add_transition('a', q2)
-        q2.add_transition('b', q2)
+        state_c.add_transition('0', state_d)
+        state_c.add_transition('1', state_e)
 
-        symbols = ['a', 'b']
-        automata = Automata([q0, q1, q2], symbols, q0, [q2])
+        state_d.add_transition('0', state_d)
+        state_d.add_transition('1', state_e)
 
-        with_terminal_node = add_terminal_node(automata)
+        state_e.add_transition('1', state_e)
+        state_e.add_transition('0', state_c)
 
-        self.assertEqual(automata.symbols, with_terminal_node.symbols)
-        self.assertEqual(len(automata.states) + 1, len(with_terminal_node.states))
+        finals = [state_c, state_d]
 
-        q0T = with_terminal_node.state_by_name("q0")
-        q1T = with_terminal_node.state_by_name("q1")
-        q2T = with_terminal_node.state_by_name("q2")
-        qT = with_terminal_node.state_by_name("qT")
+        states = [state_c, state_d, state_e]
+        symbols = ['0', '1']
 
-        self.assertEqual(symbols, q0T.transitions.keys())
-        self.assertEqual([q1T], q0T.transitions['a'])
-        self.assertEqual([qT], q0T.transitions['b'])
-        self.assertEqual(symbols, q1T.transitions.keys())
-        self.assertEqual([qT], q1T.transitions['a'])
-        self.assertEqual([q2T], q1T.transitions['b'])
-        self.assertEqual(symbols, q2T.transitions.keys())
-        self.assertEqual([q2T], q2T.transitions['a'])
-        self.assertEqual([q2T], q2T.transitions['b'])
-        self.assertEqual(symbols, qT.transitions.keys())
-        self.assertEqual([qT], qT.transitions['a'])
-        self.assertEqual([qT], qT.transitions['b'])
+        not_minimized = Automata(states, symbols, state_c, finals)
+
+        minimized = minimize(not_minimized)
+
+        # save_dot(minimized, open('hopcroft_410.dot', 'w'))
+
+        self.assertEquals(len(minimized.states), 2)
+        self.assertTrue(LAMBDA not in minimized.symbols)
+        self.assertEquals(minimized.symbols, not_minimized.symbols)
+        self.assertEquals(minimized.initial.transition('0'), minimized.initial)
+        other_node = minimized.initial.transition('1')
+        self.assertEquals(minimized.initial.transition('1').transition('0'), minimized.initial)
+        self.assertEquals(minimized.initial.transition('1'), other_node)
+        self.assertEquals(minimized.initial.transition('1').transition('1'), other_node)
 
 
 if __name__ == '__main__':
