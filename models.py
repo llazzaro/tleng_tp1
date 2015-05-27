@@ -39,7 +39,6 @@ class Node(object):
 
         return res
 
-    # FIXME: Posiblemente inútil.
     def transition(self, symbol):
         for state in self.transitions[symbol]:
             return state

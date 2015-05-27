@@ -6,6 +6,7 @@ from StringIO import StringIO
 
 from parsers import *
 from models import LAMBDA, minimize
+from ejercicio_a import nfa_to_dfa
 
 
 class TestParseAutomata(TestCase):
@@ -264,6 +265,84 @@ class TestBuildOperandTree(TestCase):
         star_content = concat_content[2].content
         self.assertTrue(isinstance(star_content, Symbol))
         self.assertEqual('\\t', star_content.content)
+
+class TestRegexTreeToNFA(TestCase):
+    def test_symbol_to_automata(self):
+        tree = Symbol('a')
+
+        tested = tree.to_automata()
+
+        self.assertEqual(['a'], tested.symbols)
+        self.assertEqual(2, len(tested.states))
+        self.assertEqual([tested.initial.transition('a')], tested.finals)
+
+    def test_star_to_automata(self):
+        tree = Star(Symbol('a'))
+
+        tested = tree.to_automata()
+        self.assertEqual(['a'], tested.symbols)
+        self.assertEqual(4, len(tested.states))
+
+        # FIXME: Mal testeo 
+        dfa_tested = nfa_to_dfa(tested)
+        self.assertTrue(dfa_tested.accepts(""))
+        self.assertTrue(dfa_tested.accepts("a"))
+        self.assertTrue(dfa_tested.accepts("aa"))
+        self.assertTrue(dfa_tested.accepts("aaa"))
+
+    def test_plus_to_automata(self):
+        tree = Plus(Symbol('a'))
+
+        tested = tree.to_automata()
+        self.assertEqual(['a'], tested.symbols)
+        #self.assertEqual(4, len(tested.states))
+
+        # FIXME: Mal testeo
+        dfa_tested = nfa_to_dfa(tested)
+        self.assertFalse(dfa_tested.accepts(""))
+        self.assertTrue(dfa_tested.accepts("a"))
+        self.assertTrue(dfa_tested.accepts("aa"))
+        self.assertTrue(dfa_tested.accepts("aaa"))
+
+    def test_opt_to_automata(self):
+        tree = Opt(Symbol('a'))
+
+        tested = tree.to_automata()
+        self.assertEqual(['a'], tested.symbols)
+        #self.assertEqual(4, len(tested.states))
+
+        # FIXME: Mal testeo
+        dfa_tested = nfa_to_dfa(tested)
+        self.assertTrue(dfa_tested.accepts(""))
+        self.assertTrue(dfa_tested.accepts("a"))
+        self.assertFalse(dfa_tested.accepts("aa"))
+        self.assertFalse(dfa_tested.accepts("aaa"))
+
+    def test_concat_to_automata(self):
+        tree = Concat([Symbol('a'), Symbol('b')])
+
+        tested = tree.to_automata()
+        self.assertEqual(['a', 'b'], tested.symbols)
+        self.assertEqual(4, len(tested.states))
+
+        # FIXME: Mal testeo
+        dfa_tested = nfa_to_dfa(tested)
+        self.assertTrue(dfa_tested.accepts("ab"))
+        self.assertFalse(dfa_tested.accepts("ba"))
+        self.assertFalse(dfa_tested.accepts(""))
+        self.assertFalse(dfa_tested.accepts("a"))
+        self.assertFalse(dfa_tested.accepts("aa"))
+        self.assertFalse(dfa_tested.accepts("aaa"))
+        self.assertFalse(dfa_tested.accepts("b"))
+        self.assertFalse(dfa_tested.accepts("bb"))
+        self.assertFalse(dfa_tested.accepts("bbb"))
+
+    def test_or_to_automata(self):
+        tree = Or([Symbol('a'), Symbol('b')])
+
+        tested = tree.to_automata()
+        self.assertEqual(['a', 'b'], tested.symbols)
+
 
 #class TestParseRegex(TestCase):
 #

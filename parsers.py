@@ -79,7 +79,10 @@ class Symbol(Tree):
 		Tree.__init__(self, content)
 
 	def to_automata(self):
-		raise NotImplementedError
+		q0 = Node()
+		q1 = Node()
+		q0.add_transition(self.content, q1)
+		return Automata([q0, q1], [self.content], q0, [q1])
 
 class Star(Tree):
 	def __init__(self, content):
@@ -87,7 +90,18 @@ class Star(Tree):
 		Tree.__init__(self, content)
 
 	def to_automata(self):
-		raise NotImplementedError
+		content_automata = self.content.to_automata()
+		q0 = Node()
+		qf = Node()
+		
+		q0.add_transition(LAMBDA, content_automata.initial)
+		q0.add_transition(LAMBDA, qf)
+
+		for q in content_automata.finals:
+			q.add_transition(LAMBDA, qf)
+			q.add_transition(LAMBDA, content_automata.initial)
+
+		return Automata([q0, qf] + content_automata.states, content_automata.symbols, q0, [qf])
 
 class Plus(Tree):
 	def __init__(self, content):
@@ -95,7 +109,7 @@ class Plus(Tree):
 		Tree.__init__(self, content)
 
 	def to_automata(self):
-		raise NotImplementedError
+		return Concat([self.content, Star(self.content)]).to_automata()
 
 class Opt(Tree):
 	def __init__(self, content):
@@ -103,25 +117,65 @@ class Opt(Tree):
 		Tree.__init__(self, content)
 
 	def to_automata(self):
-		raise NotImplementedError
+		content_automata = self.content.to_automata()
+		q0 = Node()
+		qf = Node()
+		states = [q0, qf] + content_automata.states
+		
+		q0.add_transition(LAMBDA, qf)
+		q0.add_transition(LAMBDA, content_automata.initial)
+		for q in content_automata.finals:
+			q.add_transition(LAMBDA, qf)
+
+		return Automata(states, content_automata.symbols, q0, [qf])
+		
 
 class Or(Tree):
 	def __init__(self, content):
 		assert(isinstance(content, list))
 		assert(len(content) >= 2)
+		for t in content:
+			assert(isinstance(t, Tree))
 		Tree.__init__(self, content)
 
 	def to_automata(self):
-		raise NotImplementedError
+		content_automatas = [tree.to_automata() for tree in self.content]
+		q0 = Node()
+		qf = Node()
+		states = [q0, qf]
+		symbols = []
+
+		for automata in content_automatas:
+			states += automata.states
+			symbols += automata.symbols
+
+			q0.add_transition(LAMBDA, automata.initial)
+			for finals in automata.finals:
+				finals.add_transition(LAMBDA, qf)
+
+		return Automata(states, list(set(symbols)), q0, [qf])
 
 class Concat(Tree):
 	def __init__(self, content):
 		assert(isinstance(content, list))
 		assert(len(content) >= 2)
+		for t in content:
+			assert(isinstance(t, Tree))
 		Tree.__init__(self, content)
 
 	def to_automata(self):
-		raise NotImplementedError
+		content_automatas = [tree.to_automata() for tree in self.content]
+		states = []
+		symbols = []
+
+		for i in range(len(content_automatas)):
+			states += content_automatas[i].states
+			symbols += content_automatas[i].symbols
+			if i < len(content_automatas) - 1:
+				for final in content_automatas[i].finals:
+					final.add_transition(LAMBDA, content_automatas[i+1].initial)
+
+		return Automata(states, list(set(symbols)), content_automatas[0].initial, content_automatas[-1].finals)
 
 def build_operand_tree(tree_file):
 	line = tree_file.readline()
