@@ -137,6 +137,7 @@ class TestEjercicioA(TestCase):
 
         dfa_automata = nfa_to_dfa(nfa_automata)
 
+        # FIXME reescribir
         self.assertEquals(set(dfa_automata.symbols), set(nfa_automata.symbols))
         self.assertEquals(len(dfa_automata.states), 3)
         self.assertTrue(dfa_automata.is_deterministic())
@@ -179,6 +180,7 @@ class TestEjercicioA(TestCase):
 
         dfa_automata = nfa_to_dfa(nfa_automata)
 
+        # FIXME reescribir
         self.assertEquals(len(dfa_automata.states), 5)
         self.assertEquals(dfa_automata.symbols, nfa_automata.symbols)
         self.assertEquals(len(dfa_automata.finals), 3)
