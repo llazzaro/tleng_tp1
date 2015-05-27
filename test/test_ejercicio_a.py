@@ -4,15 +4,15 @@
 import os
 import unittest
 from unittest import TestCase
-from StringIO import StringIO
 
 from models import Node, Automata, LAMBDA, minimize
-from ejercicio_a import nfa_to_dfa
+from ejercicio_a import nfa_to_dfa, afd_minimo
 from parsers import load_automata
-from writers import save_dot
+
+from StringIO import StringIO
 
 
-class TestEjercicioA(TestCase):
+class TestEjercicioASimples(TestCase):
 
     def test_simple_nfa_to_dfa(self):
         initial = Node(name='1')
@@ -35,7 +35,7 @@ class TestEjercicioA(TestCase):
 
         q0 = dfa_automata.state_by_name("q0")
         q1 = dfa_automata.state_by_name("q1")
-        q2 = dfa_automata.state_by_name("q2") # Este básicamente es trampa
+        q2 = dfa_automata.state_by_name("q2")  # Este básicamente es trampa
         q3 = dfa_automata.state_by_name("q3")
 
         self.assertEqual(q0, dfa_automata.initial)
@@ -49,7 +49,6 @@ class TestEjercicioA(TestCase):
         self.assertEqual(q2, q2.transition('b'))
         self.assertEqual(q2, q3.transition('a'))
         self.assertEqual(q2, q3.transition('b'))
-
 
     def test_simple_nfa_to_dfa_other(self):
         """
@@ -82,7 +81,7 @@ class TestEjercicioA(TestCase):
 
         q0 = dfa_automata.state_by_name("q0")
         q1 = dfa_automata.state_by_name("q1")
-        q2 = dfa_automata.state_by_name("q2") # Este básicamente es trampa
+        q2 = dfa_automata.state_by_name("q2")  # Este básicamente es trampa
         q3 = dfa_automata.state_by_name("q3")
         q4 = dfa_automata.state_by_name("q4")
         q5 = dfa_automata.state_by_name("q5")
@@ -111,7 +110,6 @@ class TestEjercicioA(TestCase):
         self.assertEqual(q2, q7.transition('b'))
         self.assertEqual(q3, q8.transition('a'))
         self.assertEqual(q8, q8.transition('b'))
-
 
     def test_convert_nfa_to_dfa_from_hopcroft(self):
         """
@@ -209,6 +207,177 @@ class TestEjercicioA(TestCase):
         self.assertEquals(minimized.symbols, automata.symbols)
         self.assertEquals(len(minimized.states), 8)
         self.assertTrue(LAMBDA not in minimized.symbols)
+
+
+class TestEjercicioADesdeArchivo(TestCase):
+
+    def test_only_symbol(self):
+        input_regex_tree = 'a'
+        file_input = StringIO(input_regex_tree)
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+        import ipdb
+        ipdb.set_trace()
+
+    def test_regex_rompe(self):
+        """
+            caso de prueba de la correccion
+        """
+        input_regex = '{CONCAT}2\n'
+        input_regex += '\ta\n'
+        input_regex += '\ta\n'
+        file_input = StringIO(input_regex)
+        file_output = StringIO()
+
+        # aca reviso el resultado del ejercicio a.
+        # user load_automata no es lo ideal
+        file_input.seek(0)
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+        #self.assertEquals(len(result.states), 3)
+
+    def test_other_symbols(self):
+        for symbol in '([,:;.¿?!¡()"\'\&-]':
+            input_regex_tree = symbol
+            file_input = StringIO(input_regex_tree)
+            file_output = StringIO(input_regex_tree)
+
+            afd_minimo(file_input, file_output)
+            file_output.seek(0)
+            result = load_automata(file_output)
+
+    def test_simple_or(self):
+        input_regex_tree = '{OR}2\n\ta\n\tb'
+        file_input = StringIO(input_regex_tree)
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+    def test_simple_concat(self):
+        input_regex_tree = '{CONCAT}2\n\ta\n\tb'
+        file_input = StringIO(input_regex_tree)
+        file_output = StringIO()
+        afd_minimo(file_input, file_output)
+
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+    def test_other_simple_concat(self):
+        input_regex_tree = '{CONCAT}3\n\tc\n\tb\n\ta'
+        file_input = StringIO(input_regex_tree)
+
+        file_output = StringIO()
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+        raise Exception
+
+    def test_simple_plus(self):
+        input_regex_tree = '{PLUS}\n\ta'
+        file_input = StringIO(input_regex_tree)
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+       # from_two = result.initial.transitions[LAMBDA].pop()
+
+    def test_simple_star(self):
+        input_regex_tree = '{STAR}\n\ta'
+        file_input = StringIO(input_regex_tree)
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+        self.assertEquals(len(result.states), 1)
+
+    def test_simple_opt(self):
+        input_regex_tree = '{OPT}\n\ta'
+        file_input = StringIO(input_regex_tree)
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+    def test_regex_enunciado_1(self):
+        # '(a|b|c)*(de)+f'
+        file_input = '{CONCAT}3\n'
+        file_input += '\t{STAR}\n'
+        file_input += '\t\t{OR}3\n'
+        file_input += '\t\t\ta\n'
+        file_input += '\t\t\tb\n'
+        file_input += '\t\t\tc\n'
+        file_input += '\t{PLUS}\n'
+        file_input += '\t\t{CONCAT}2\n'
+        file_input += '\t\t\td\n'
+        file_input += '\t\t\te\n'
+        file_input += '\tf'
+
+        file_input = StringIO(file_input)
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+        self.assertTrue(result.symbols, set(['a', 'b', 'c', 'd', 'e', 'f']))
+
+    def test_bug_simple(self):
+        """
+            El segundo OR usa los param del primero. este test verifica que no pase esto
+        """
+        file_input = '{CONCAT}2\n'
+        file_input += '\t{OR}2\n'
+        file_input += '\t\ta\n'
+        file_input += '\t\tb\n'
+        file_input += '\t{OR}2\n'
+        file_input += '\t\tc\n'
+        file_input += '\t\td'
+        file_input = StringIO(file_input)
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
+
+    def test_regex_enunciado_2(self):
+        # '(-ABC)?(0|1)+\t*'
+        # file_input = StringIO('(-ABC)?(0|1)+\t*')
+        # result = afd_minimo(file_input)
+        file_input = '{CONCAT}3\n'
+        file_input += '\t{OPT}\n'
+        file_input += '\t\t{CONCAT}4\n'
+        file_input += '\t\t\t-\n'
+        file_input += '\t\t\tA\n'
+        file_input += '\t\t\tB\n'
+        file_input += '\t\t\tC\n'
+        file_input += '\t{PLUS}\n'
+        file_input += '\t\t{OR}2\n'
+        file_input += '\t\t\t0\n'
+        file_input += '\t\t\t1\n'
+        file_input += '\t{STAR}\n'
+        file_input += '\t\t\t'
+
+        file_input = StringIO(file_input)
+
+        file_output = StringIO()
+
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = load_automata(file_output)
 
 
 if __name__ == '__main__':

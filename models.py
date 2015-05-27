@@ -120,7 +120,11 @@ class Automata:
     #            return
 
     def has_lambda(self):
-        return LAMBDA in self.symbols
+        for state in self.states:
+            for symbol in state.transitions:
+                if symbol == LAMBDA:
+                    return True
+        return False
 
     def is_lambda_deterministic(self):
         res = True

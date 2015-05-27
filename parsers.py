@@ -157,7 +157,7 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][number_of_operands:]
         finals = operand_automatas[-1:][0].finals
 
-        return Automata(states, symbols, initial, finals)
+        return Automata(states, list(set(symbols)), initial, finals)
     elif '{STAR}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
@@ -174,7 +174,7 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         initial.add_transition(LAMBDA, operand_automata.initial)
         initial.add_transition(LAMBDA, final)
         operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][1:]
-        return Automata(states, symbols, initial, [final])
+        return Automata(states, list(set(symbols)), initial, [final])
     elif '{PLUS}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
@@ -191,7 +191,7 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         initial.add_transition(LAMBDA, operand_automata.initial)
 
         operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][1:]
-        return Automata(states, symbols, initial, [final])
+        return Automata(states, list(set(symbols)), initial, [final])
     elif '{OPT}' in current_operand_or_symbol[0]:
         initial = Node()
         final = Node()
@@ -209,7 +209,7 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         initial.add_transition(LAMBDA, operand_automata.initial)
 
         operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][1:]
-        return Automata(states, symbols, initial, [final])
+        return Automata(states, list(set(symbols)), initial, [final])
     elif '{OR}' in current_operand_or_symbol[0]:
         number_of_operands = current_operand_or_symbol[1]
         initial = Node()
@@ -227,7 +227,7 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
                 final.add_transition(LAMBDA, new_final)
 
         operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][number_of_operands:]
-        return Automata(states, symbols, initial, [new_final])
+        return Automata(states, list(set(symbols)), initial, [new_final])
     else:
         # simbolo alfabeto
         assert current_operand_or_symbol[0] == '{SYMBOL}'
@@ -239,4 +239,4 @@ def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
         states = [initial, final]
         symbols = [symbol]
         initial.add_transition(symbol, final)
-        return Automata(states, symbols, initial, [final])
+        return Automata(states, list(set(symbols)), initial, [final])

@@ -37,13 +37,12 @@ class TestParseAutomata(TestCase):
 
         self.assertEqual(q0.transitions.keys(), ['a'])
         self.assertEqual(q0.transitions['a'], [q1])
-        #Convierto a set para ignorar el orden en la lista
+        # Convierto a set para ignorar el orden en la lista
         self.assertEqual(set(q1.transitions.keys()), set(['b', 'c']))
         self.assertEqual(q1.transitions['b'], [q2])
         self.assertEqual(q1.transitions['c'], [q1])
         self.assertEqual(q2.transitions.keys(), ['f'])
         self.assertEqual(q2.transitions['f'], [q2])
-
 
     def test_archivo_automata__transicion_estado_invalido(self):
         input_text = 'q0\n'
