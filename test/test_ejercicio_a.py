@@ -75,15 +75,43 @@ class TestEjercicioA(TestCase):
         nfa_automata = Automata([initial, state_2, state_3, state_4, state_5, state_6], ['a', 'b'], initial, [state_4, state_6])
         dfa_automata = nfa_to_dfa(nfa_automata)
 
-        self.assertEquals(len(dfa_automata.states), 9)
-        # revisar
-        self.assertEquals(len(dfa_automata.finals), 5)
-        self.assertTrue(dfa_automata.initial.transition('a') in dfa_automata.finals)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('b') in dfa_automata.finals)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b') in dfa_automata.finals)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b').transition('b') in dfa_automata.finals)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('a') not in dfa_automata.finals)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('a').transition('b') in dfa_automata.finals)
+        self.assertTrue(dfa_automata.is_deterministic())
+
+        self.assertEqual(nfa_automata.symbols, dfa_automata.symbols)
+        self.assertEqual(len(dfa_automata.states), 9)
+
+        q0 = dfa_automata.state_by_name("q0")
+        q1 = dfa_automata.state_by_name("q1")
+        q2 = dfa_automata.state_by_name("q2") # Este básicamente es trampa
+        q3 = dfa_automata.state_by_name("q3")
+        q4 = dfa_automata.state_by_name("q4")
+        q5 = dfa_automata.state_by_name("q5")
+        q6 = dfa_automata.state_by_name("q6")
+        q7 = dfa_automata.state_by_name("q7")
+        q8 = dfa_automata.state_by_name("q8")
+
+        self.assertEqual(q0, dfa_automata.initial)
+        self.assertEqual(set([q1, q4, q5, q6, q8]), set(dfa_automata.finals))
+
+        self.assertEqual(q1, q0.transition('a'))
+        self.assertEqual(q2, q0.transition('b'))
+        self.assertEqual(q3, q1.transition('a'))
+        self.assertEqual(q4, q1.transition('b'))
+        self.assertEqual(q2, q2.transition('a'))
+        self.assertEqual(q2, q2.transition('b'))
+        self.assertEqual(q2, q3.transition('a'))
+        self.assertEqual(q5, q3.transition('b'))
+        self.assertEqual(q3, q4.transition('a'))
+        self.assertEqual(q6, q4.transition('b'))
+        self.assertEqual(q2, q5.transition('a'))
+        self.assertEqual(q7, q5.transition('b'))
+        self.assertEqual(q1, q6.transition('a'))
+        self.assertEqual(q8, q6.transition('b'))
+        self.assertEqual(q8, q7.transition('a'))
+        self.assertEqual(q2, q7.transition('b'))
+        self.assertEqual(q3, q8.transition('a'))
+        self.assertEqual(q8, q8.transition('b'))
+
 
     def test_convert_nfa_to_dfa_from_hopcroft(self):
         """
