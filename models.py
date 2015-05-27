@@ -214,6 +214,26 @@ def minimize(automata):
             else:
                 ms.add_transition(a, target_node)
 
+    # Saco el estado trampa
+    terminal_node = None
+    for state in min_states:
+
+        terminal = state not in min_finals
+
+        for a in state.transitions.keys():
+            terminal = terminal and state.transition(a) == state
+
+        if terminal:
+            terminal_node = state
+            break
+
+    if terminal_node != None:
+        for state in min_states:
+            for a in state.transitions.keys():
+                if state.transition(a) == terminal_node:
+                    state.transitions.pop(a)
+        min_states.remove(terminal_node)
+
     return Automata(min_states, automata.symbols, min_initial, min_finals)
 
 

@@ -493,11 +493,10 @@ class TestMinimize(TestCase):
         minimized = minimize(automata)
 
         self.assertEqual(automata.symbols, minimized.symbols)
-        self.assertEqual(3, len(minimized.states))
+        self.assertEqual(2, len(minimized.states))
 
         q0 = minimized.state_by_name("q0")
         q1 = minimized.state_by_name("q1")
-        q2 = minimized.state_by_name("q2")
         
         self.assertEqual(q0, minimized.initial)
         self.assertEqual([q1], minimized.finals)
@@ -505,9 +504,6 @@ class TestMinimize(TestCase):
         self.assertEqual(q0, q0.transition('0'))
         self.assertEqual(q1, q0.transition('1'))
         self.assertEqual(q1, q1.transition('0'))
-        self.assertEqual(q2, q1.transition('1'))
-        self.assertEqual(q2, q2.transition('0'))
-        self.assertEqual(q2, q2.transition('1'))
 
 
     #FIXME: reescribir evitando el load_automata y rechequeando
