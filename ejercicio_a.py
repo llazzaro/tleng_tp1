@@ -25,26 +25,6 @@ def lambda_closure(from_states, automata):
     return res
 
 
-def copy_with_terminal_node(automata):
-    return add_terminal_node(automata)
-
-
-def remover_nodos_redundantes(automata):
-    to_remove = set()
-    for state in automata.states:
-        recheable_states = list(itertools.chain(*state.transitions.values()))
-        if all(map(lambda to_state: state == to_state, recheable_states)) and state not in automata.finals:
-            to_remove.add(state)
-
-    if to_remove:
-        for state in automata.states:
-            for symbol in automata.symbols:
-                to_states = state.transitions[symbol]
-                state.transitions[symbol] = to_states - to_remove
-
-    return Automata(automata.initial, automata.finals)
-
-
 def nfa_to_dfa(automata):
     nfa_states = {}
     initial = Node()
