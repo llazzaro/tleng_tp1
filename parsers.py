@@ -67,310 +67,141 @@ def load_automata(automata_file):
     return Automata(states, symbols, initial, finals)
 
 class Tree():
-	def __init__(self, content):
-		self.content = content
+    def __init__(self, content):
+        self.content = content
 
-	def to_automata(self):
-		pass
+    def to_automata(self):
+        pass
 
 class Symbol(Tree):
-	def __init__(self, content):
-		assert(isinstance(content, str))
-		Tree.__init__(self, content)
+    def __init__(self, content):
+        assert(isinstance(content, str))
+        Tree.__init__(self, content)
 
-	def to_automata(self):
-		q0 = Node()
-		q1 = Node()
-		q0.add_transition(self.content, q1)
-		return Automata([q0, q1], [self.content], q0, [q1])
+    def to_automata(self):
+        q0 = Node()
+        q1 = Node()
+        q0.add_transition(self.content, q1)
+        return Automata([q0, q1], [self.content], q0, [q1])
 
 class Star(Tree):
-	def __init__(self, content):
-		assert(isinstance(content, Tree))
-		Tree.__init__(self, content)
+    def __init__(self, content):
+        assert(isinstance(content, Tree))
+        Tree.__init__(self, content)
 
-	def to_automata(self):
-		content_automata = self.content.to_automata()
-		q0 = Node()
-		qf = Node()
-		
-		q0.add_transition(LAMBDA, content_automata.initial)
-		q0.add_transition(LAMBDA, qf)
+    def to_automata(self):
+        content_automata = self.content.to_automata()
+        q0 = Node()
+        qf = Node()
+        
+        q0.add_transition(LAMBDA, content_automata.initial)
+        q0.add_transition(LAMBDA, qf)
 
-		for q in content_automata.finals:
-			q.add_transition(LAMBDA, qf)
-			q.add_transition(LAMBDA, content_automata.initial)
+        for q in content_automata.finals:
+            q.add_transition(LAMBDA, qf)
+            q.add_transition(LAMBDA, content_automata.initial)
 
-		return Automata([q0, qf] + content_automata.states, content_automata.symbols, q0, [qf])
+        return Automata([q0, qf] + content_automata.states, content_automata.symbols, q0, [qf])
 
 class Plus(Tree):
-	def __init__(self, content):
-		assert(isinstance(content, Tree))
-		Tree.__init__(self, content)
+    def __init__(self, content):
+        assert(isinstance(content, Tree))
+        Tree.__init__(self, content)
 
-	def to_automata(self):
-		return Concat([self.content, Star(self.content)]).to_automata()
+    def to_automata(self):
+        return Concat([self.content, Star(self.content)]).to_automata()
 
 class Opt(Tree):
-	def __init__(self, content):
-		assert(isinstance(content, Tree))
-		Tree.__init__(self, content)
+    def __init__(self, content):
+        assert(isinstance(content, Tree))
+        Tree.__init__(self, content)
 
-	def to_automata(self):
-		content_automata = self.content.to_automata()
-		q0 = Node()
-		qf = Node()
-		states = [q0, qf] + content_automata.states
-		
-		q0.add_transition(LAMBDA, qf)
-		q0.add_transition(LAMBDA, content_automata.initial)
-		for q in content_automata.finals:
-			q.add_transition(LAMBDA, qf)
+    def to_automata(self):
+        content_automata = self.content.to_automata()
+        q0 = Node()
+        qf = Node()
+        states = [q0, qf] + content_automata.states
+        
+        q0.add_transition(LAMBDA, qf)
+        q0.add_transition(LAMBDA, content_automata.initial)
+        for q in content_automata.finals:
+            q.add_transition(LAMBDA, qf)
 
-		return Automata(states, content_automata.symbols, q0, [qf])
-		
+        return Automata(states, content_automata.symbols, q0, [qf])
+        
 
 class Or(Tree):
-	def __init__(self, content):
-		assert(isinstance(content, list))
-		assert(len(content) >= 2)
-		for t in content:
-			assert(isinstance(t, Tree))
-		Tree.__init__(self, content)
+    def __init__(self, content):
+        assert(isinstance(content, list))
+        assert(len(content) >= 2)
+        for t in content:
+            assert(isinstance(t, Tree))
+        Tree.__init__(self, content)
 
-	def to_automata(self):
-		content_automatas = [tree.to_automata() for tree in self.content]
-		q0 = Node()
-		qf = Node()
-		states = [q0, qf]
-		symbols = []
+    def to_automata(self):
+        content_automatas = [tree.to_automata() for tree in self.content]
+        q0 = Node()
+        qf = Node()
+        states = [q0, qf]
+        symbols = []
 
-		for automata in content_automatas:
-			states += automata.states
-			symbols += automata.symbols
+        for automata in content_automatas:
+            states += automata.states
+            symbols += automata.symbols
 
-			q0.add_transition(LAMBDA, automata.initial)
-			for finals in automata.finals:
-				finals.add_transition(LAMBDA, qf)
+            q0.add_transition(LAMBDA, automata.initial)
+            for finals in automata.finals:
+                finals.add_transition(LAMBDA, qf)
 
-		return Automata(states, list(set(symbols)), q0, [qf])
+        return Automata(states, list(set(symbols)), q0, [qf])
 
 class Concat(Tree):
-	def __init__(self, content):
-		assert(isinstance(content, list))
-		assert(len(content) >= 2)
-		for t in content:
-			assert(isinstance(t, Tree))
-		Tree.__init__(self, content)
+    def __init__(self, content):
+        assert(isinstance(content, list))
+        assert(len(content) >= 2)
+        for t in content:
+            assert(isinstance(t, Tree))
+        Tree.__init__(self, content)
 
-	def to_automata(self):
-		content_automatas = [tree.to_automata() for tree in self.content]
-		states = []
-		symbols = []
-
-		for i in range(len(content_automatas)):
-			states += content_automatas[i].states
-			symbols += content_automatas[i].symbols
-			if i < len(content_automatas) - 1:
-				for final in content_automatas[i].finals:
-					final.add_transition(LAMBDA, content_automatas[i+1].initial)
-
-		return Automata(states, list(set(symbols)), content_automatas[0].initial, content_automatas[-1].finals)
-
-def build_operand_tree(tree_file):
-	line = tree_file.readline()
-	if '{CONCAT}' in line:
-		tabs, number_of_operands = line.split('{CONCAT}')
-		content = []
-		for i in range(int(number_of_operands)):
-			content.append(build_operand_tree(tree_file))
-		return Concat(content)
-	elif '{OR}' in line:
-		tabs, number_of_operands = line.split('{OR}')
-		content = []
-		for i in range(int(number_of_operands)):
-			content.append(build_operand_tree(tree_file))
-		return Or(content)
-	elif '{OPT}' in line:
-		return Opt(build_operand_tree(tree_file))
-	elif '{PLUS}' in line:
-		return Plus(build_operand_tree(tree_file))
-	elif '{STAR}' in line:
-		depth = line.count('\t')
-		return Star(build_operand_tree(tree_file))
-	else:
-		return Symbol(line.strip())
-
-def verify_integrity(res):
-    """
-        Revisa si para los op que tienen numero de operandos,
-        este numero es valido (si hay dos param hay dos ni mas ni menos)
-
-        si encuentra algo que esta mal lanza exception
-    """
-
-    for deep, list_of_op in res.iteritems():
-        for op, number_of_operands in list_of_op:
-            if op in ['{CONCAT}', '{OR}']:
-                if len(res[deep + 1]) < number_of_operands:
-                    raise Exception('{2} requiere {1} paramteros, se encontro solamente {0} parametros'.format(len(res[deep + 1]), number_of_operands, op))
-
-
-def build_operand_dict(tree_file):
-    """
-        this function will return a list of "new" files
-        that will we used for recurive calls with smaller
-        tree.
-    """
-    res = defaultdict(list)
-    for line in tree_file.readlines():
-        if '{CONCAT}' in line:
-            tabs, number_of_operands = line.split('{CONCAT}')
-            number_of_operands = int(number_of_operands.strip('\n'))
-            deep = len(tabs)
-            res[deep].append(('{CONCAT}', number_of_operands))
-        elif '{STAR}' in line:
-            tabs, _ = line.split('{STAR}')
-            deep = len(tabs)
-            res[deep].append(('{STAR}', None))
-        elif '{PLUS}' in line:
-            tabs, _ = line.split('{PLUS}')
-            deep = len(tabs)
-            res[deep].append(('{PLUS}', None))
-        elif '{OPT}' in line:
-            tabs, _ = line.split('{OPT}')
-            deep = len(tabs)
-            res[deep].append(('{OPT}', None))
-        elif '{OR}' in line:
-            tabs, number_of_operands = line.split('{OR}')
-            number_of_operands = int(number_of_operands.strip('\n'))
-            deep = len(tabs)
-            res[deep].append(('{OR}', number_of_operands))
-        else:
-            deep = line.count('\t')
-            current_line = line.strip('\t').strip('\n')
-            if len(current_line) == 0:
-                current_line = '\t'
-                deep = deep - 1
-
-            res[deep].append(('{SYMBOL}', current_line))
-    verify_integrity(res)
-    return res
-
-
-def regex_to_automata(tree_file):
-    operand_dict = build_operand_dict(tree_file)
-    res = build_automata(operand_dict[0][0], 0, operand_dict)
-
-    return res
-
-
-def build_automata(current_operand_or_symbol, deep, operand_or_symbol_dict):
-    if '{CONCAT}' == current_operand_or_symbol[0]:
-        number_of_operands = current_operand_or_symbol[1]
-        initial = None
-        finals = None
+    def to_automata(self):
+        content_automatas = [tree.to_automata() for tree in self.content]
         states = []
         symbols = []
-        operand_or_symbols = operand_or_symbol_dict[deep + 1]
-        operand_or_symbols = operand_or_symbols[:number_of_operands]
-        operand_automatas = []
-        for operand in operand_or_symbols:
-            operand_automatas.append(build_automata(operand, deep + 1, operand_or_symbol_dict))
 
-        initial = operand_automatas[0].initial
-        for index, operand_automata in enumerate(operand_automatas):
-            states += operand_automata.states
-            symbols += operand_automata.symbols
-            if index > len(operand_automatas) - 2:
-                # es el ultimo operando
-                continue
-            for final in operand_automata.finals:
-                final.add_transition(LAMBDA, operand_automatas[index + 1].initial)
+        for i in range(len(content_automatas)):
+            states += content_automatas[i].states
+            symbols += content_automatas[i].symbols
+            if i < len(content_automatas) - 1:
+                for final in content_automatas[i].finals:
+                    final.add_transition(LAMBDA, content_automatas[i+1].initial)
 
-        operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][number_of_operands:]
-        finals = operand_automatas[-1:][0].finals
+        return Automata(states, list(set(symbols)), content_automatas[0].initial, content_automatas[-1].finals)
 
-        return Automata(states, symbols, initial, finals)
-    elif '{STAR}' in current_operand_or_symbol[0]:
-        initial = Node()
-        final = Node()
-        states = [initial, final]
-        symbols = []
-        for operand in operand_or_symbol_dict[deep + 1][:1]:
-            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-            states += operand_automata.states
-            symbols += operand_automata.symbols
-        for dfa_final in operand_automata.finals:
-            dfa_final.add_transition(LAMBDA, final)
-            dfa_final.add_transition(LAMBDA, operand_automata.initial)
-
-        initial.add_transition(LAMBDA, operand_automata.initial)
-        initial.add_transition(LAMBDA, final)
-        operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][1:]
-        return Automata(states, symbols, initial, [final])
-    elif '{PLUS}' in current_operand_or_symbol[0]:
-        initial = Node()
-        final = Node()
-        symbols = []
-        states = [initial, final]
-        for operand in operand_or_symbol_dict[deep + 1][:1]:
-            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-            states += operand_automata.states
-            symbols += operand_automata.symbols
-        for dfa_final in operand_automata.finals:
-            dfa_final.add_transition(LAMBDA, final)
-            dfa_final.add_transition(LAMBDA, operand_automata.initial)
-
-        initial.add_transition(LAMBDA, operand_automata.initial)
-
-        operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][1:]
-        return Automata(states, symbols, initial, [final])
-    elif '{OPT}' in current_operand_or_symbol[0]:
-        initial = Node()
-        final = Node()
-        states = [initial, final]
-        symbols = []
-        initial.add_transition(LAMBDA, final)
-
-        for operand in operand_or_symbol_dict[deep + 1][:1]:
-            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-            states += operand_automata.states
-            symbols += operand_automata.symbols
-
-        for dfa_final in operand_automata.finals:
-            dfa_final.add_transition(LAMBDA, final)
-        initial.add_transition(LAMBDA, operand_automata.initial)
-
-        operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][1:]
-        return Automata(states, symbols, initial, [final])
-    elif '{OR}' in current_operand_or_symbol[0]:
-        number_of_operands = current_operand_or_symbol[1]
-        initial = Node()
-        new_final = Node()
-        states = [initial, new_final]
-        symbols = []
-        operand_or_symbols = operand_or_symbol_dict[deep + 1][:number_of_operands]
-
-        for operand in operand_or_symbols:
-            operand_automata=build_automata(operand, deep + 1, operand_or_symbol_dict)
-            states += operand_automata.states
-            symbols += operand_automata.symbols
-            initial.add_transition(LAMBDA, operand_automata.initial)
-            for final in operand_automata.finals:
-                final.add_transition(LAMBDA, new_final)
-
-        operand_or_symbol_dict[deep + 1] = operand_or_symbol_dict[deep + 1][number_of_operands:]
-        return Automata(states, symbols, initial, [new_final])
+def build_operand_tree(tree_file):
+    line = tree_file.readline()
+    if '{CONCAT}' in line:
+        tabs, number_of_operands = line.split('{CONCAT}')
+        content = []
+        for i in range(int(number_of_operands)):
+            content.append(build_operand_tree(tree_file))
+        return Concat(content)
+    elif '{OR}' in line:
+        tabs, number_of_operands = line.split('{OR}')
+        content = []
+        for i in range(int(number_of_operands)):
+            content.append(build_operand_tree(tree_file))
+        return Or(content)
+    elif '{OPT}' in line:
+        return Opt(build_operand_tree(tree_file))
+    elif '{PLUS}' in line:
+        return Plus(build_operand_tree(tree_file))
+    elif '{STAR}' in line:
+        depth = line.count('\t')
+        return Star(build_operand_tree(tree_file))
     else:
-        # simbolo alfabeto
-        assert current_operand_or_symbol[0] == '{SYMBOL}'
-        symbol=current_operand_or_symbol[1]
-        if symbol not in string.letters + '([,:;.¿?!¡()"\'\&-] \t' + '0123456789':
-            raise Exception('El simbolo {0} no esta permitido'.format(symbol))
-        initial=Node()
-        final=Node()
-        states = [initial, final]
-        symbols = [symbol]
-        initial.add_transition(symbol, final)
-        return Automata(states, symbols, initial, [final])
+        return Symbol(line.strip())
+
+def regex_to_automata(tree_file):
+    operand_tree = build_operand_tree(tree_file)
+    return operand_tree.to_automata()
+

@@ -196,19 +196,20 @@ class TestEjercicioA(TestCase):
         self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('a') == dfa_automata.initial.transition('a').transition('a'))
         self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b') == dfa_automata.initial.transition('a').transition('a'))
 
-    def test_minimize_caso_regex_enunciado(self):
-        current_dir = os.path.dirname(os.path.abspath(__file__))
-        input_file = open(os.path.join(current_dir, 'automata_pruebas.aut'), 'r')
+	# FIXME Desactivado porque no existe ese archivo
+    #def test_minimize_caso_regex_enunciado(self):
+    #    current_dir = os.path.dirname(os.path.abspath(__file__))
+    #    input_file = open(os.path.join(current_dir, 'automata_pruebas.aut'), 'r')
 
-        automata = load_automata(input_file)
+    #    automata = load_automata(input_file)
 
-        self.assertEquals(len(automata.states), 12)
+    #    self.assertEquals(len(automata.states), 12)
 
-        minimized = minimize(automata)
+    #    minimized = minimize(automata)
 
-        self.assertEquals(minimized.symbols, automata.symbols)
-        self.assertEquals(len(minimized.states), 8)
-        self.assertTrue(LAMBDA not in minimized.symbols)
+    #    self.assertEquals(minimized.symbols, automata.symbols)
+    #    self.assertEquals(len(minimized.states), 8)
+    #    self.assertTrue(LAMBDA not in minimized.symbols)
 
 
 if __name__ == '__main__':
