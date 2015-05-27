@@ -4,7 +4,9 @@
 import unittest
 from unittest import TestCase
 
+from StringIO import StringIO
 from models import *
+from parsers import load_automata
 
 class TestNode(TestCase):
     def test_construccion_node__with_name(self):
@@ -428,6 +430,7 @@ class TestMinimize(TestCase):
         self.assertEqual([q3], q3.transitions['a'])
         self.assertEqual([q3], q3.transitions['b'])
 
+    #FIXME: reescribir evitando el load_automata y rechequeando
     def test_minimize__example_from_hopcroft(self):
         """
             basado en la figura 4.10 del libro
@@ -464,6 +467,83 @@ class TestMinimize(TestCase):
         self.assertEquals(minimized.initial.transition('1').transition('0'), minimized.initial)
         self.assertEquals(minimized.initial.transition('1'), other_node)
         self.assertEquals(minimized.initial.transition('1').transition('1'), other_node)
+
+    def test_wikipedia_example_minimization(self):
+        state_a = Node(name='a')
+        state_b = Node(name='b')
+        state_c = Node(name='c')
+        state_d = Node(name='d')
+        state_e = Node(name='e')
+        state_f = Node(name='f')
+
+        state_a.add_transition('0', state_b)
+        state_a.add_transition('1', state_c)
+        state_b.add_transition('0', state_a)
+        state_b.add_transition('1', state_d)
+        state_c.add_transition('0', state_e)
+        state_c.add_transition('1', state_f)
+        state_d.add_transition('0', state_e)
+        state_d.add_transition('1', state_f)
+        state_e.add_transition('0', state_e)
+        state_e.add_transition('1', state_f)
+        state_f.add_transition('0', state_f)
+        state_f.add_transition('1', state_f)
+
+        automata = Automata([state_a, state_b, state_c, state_d, state_e, state_f], ['0', '1'], state_a, [state_c, state_d, state_e])
+        minimized = minimize(automata)
+
+        self.assertEqual(automata.symbols, minimized.symbols)
+        self.assertEqual(3, len(minimized.states))
+
+        q0 = minimized.state_by_name("q0")
+        q1 = minimized.state_by_name("q1")
+        q2 = minimized.state_by_name("q2")
+        
+        self.assertEqual(q0, minimized.initial)
+        self.assertEqual([q1], minimized.finals)
+        
+        self.assertEqual(q0, q0.transition('0'))
+        self.assertEqual(q1, q0.transition('1'))
+        self.assertEqual(q1, q1.transition('0'))
+        self.assertEqual(q2, q1.transition('1'))
+        self.assertEqual(q2, q2.transition('0'))
+        self.assertEqual(q2, q2.transition('1'))
+
+
+    #FIXME: reescribir evitando el load_automata y rechequeando
+    def test_minimize_hopcroft_figure_4_8(self):
+        input_automata = '\t'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) + '\n'
+        input_automata += '0\t1\n'
+        input_automata += 'a\n'
+        input_automata += 'c\n'
+        input_automata += 'a\t0\tb\n'
+        input_automata += 'a\t1\tf\n'
+        input_automata += 'b\t1\tc\n'
+        input_automata += 'b\t0\tg\n'
+        input_automata += 'c\t1\tc\n'
+        input_automata += 'c\t0\ta\n'
+        input_automata += 'd\t0\tc\n'
+        input_automata += 'd\t1\tg\n'
+        input_automata += 'e\t1\tf\n'
+        input_automata += 'e\t0\th\n'
+        input_automata += 'f\t0\tc\n'
+        input_automata += 'f\t1\tg\n'
+        input_automata += 'g\t0\tg\n'
+        input_automata += 'g\t1\te\n'
+        input_automata += 'h\t0\tg\n'
+        input_automata += 'h\t1\tc\n'
+
+        automata = load_automata(StringIO(input_automata))
+        minimized = minimize(automata)
+
+        self.assertEquals(len(minimized.states), 5)
+        self.assertEquals(len(minimized.finals), 1)
+        self.assertTrue(LAMBDA not in minimized.symbols)
+
+        self.assertTrue(minimized.initial.transition('0').transition('1') in minimized.finals)
+        self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
+        self.assertEquals(minimized.initial.transition('1').transition('1').transition('1'), minimized.initial)
+
 
 
 if __name__ == '__main__':
