@@ -4,7 +4,7 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from parsers import regex_to_automata, load_automata
+from parsers import *
 from models import LAMBDA, minimize
 
 
@@ -93,6 +93,177 @@ class TestParseAutomata(TestCase):
         with self.assertRaises(Exception):
             load_automata(file_input)
 
+
+class TestBuildOperandTree(TestCase):
+    def test_only_symbol(self):
+        input_regex_tree = 'a'
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+        
+        self.assertTrue(isinstance(tree, Symbol))
+        self.assertEqual('a', tree.content)
+
+    def test_only_concat(self):
+        input_regex_tree = "{CONCAT}2\n"
+        input_regex_tree += "\ta\n"
+        input_regex_tree += "\tb\n"
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+
+        self.assertTrue(isinstance(tree, Concat))
+        self.assertTrue(isinstance(tree.content, list))
+        self.assertEqual(2, len(tree.content))
+        content = tree.content
+        self.assertTrue(isinstance(content[0], Symbol))
+        self.assertEqual('a', content[0].content)
+        self.assertTrue(isinstance(content[1], Symbol))
+        self.assertEqual('b', content[1].content)
+
+    def test_only_or(self):
+        input_regex_tree = "{OR}2\n"
+        input_regex_tree += "\ta\n"
+        input_regex_tree += "\tb\n"
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+
+        self.assertTrue(isinstance(tree, Or))
+        self.assertTrue(isinstance(tree.content, list))
+        self.assertEqual(2, len(tree.content))
+        content = tree.content
+        self.assertTrue(isinstance(content[0], Symbol))
+        self.assertEqual('a', content[0].content)
+        self.assertTrue(isinstance(content[1], Symbol))
+        self.assertEqual('b', content[1].content)
+
+    def test_only_star(self):
+        input_regex_tree = "{STAR}\n"
+        input_regex_tree += "\ta\n"
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+
+        self.assertTrue(isinstance(tree, Star))
+        self.assertTrue(isinstance(tree.content, Symbol))
+        self.assertEqual('a', tree.content.content)
+
+    def test_only_plus(self):
+        input_regex_tree = "{PLUS}\n"
+        input_regex_tree += "\ta\n"
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+
+        self.assertTrue(isinstance(tree, Plus))
+        self.assertTrue(isinstance(tree.content, Symbol))
+        self.assertEqual('a', tree.content.content)
+    
+    def test_only_plus(self):
+        input_regex_tree = "{OPT}\n"
+        input_regex_tree += "\ta\n"
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+
+        self.assertTrue(isinstance(tree, Opt))
+        self.assertTrue(isinstance(tree.content, Symbol))
+        self.assertEqual('a', tree.content.content)
+    
+    def test_ejemplo_uno_enunciado(self):
+        input_regex_tree = "{CONCAT}3\n"
+        input_regex_tree += "\t{STAR}\n"
+        input_regex_tree += "\t\t{OR}3\n"
+        input_regex_tree += "\t\t\ta\n"
+        input_regex_tree += "\t\t\tb\n"
+        input_regex_tree += "\t\t\tc\n"
+        input_regex_tree += "\t{PLUS}\n"
+        input_regex_tree += "\t\t{CONCAT}2\n"
+        input_regex_tree += "\t\t\td\n"
+        input_regex_tree += "\t\t\te\n"
+        input_regex_tree += "\tf\n"
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+
+        self.assertTrue(isinstance(tree, Concat))
+        self.assertTrue(isinstance(tree.content, list))
+        self.assertEqual(3, len(tree.content))
+        concat_content = tree.content
+        self.assertTrue(isinstance(concat_content[0], Star))
+        self.assertTrue(isinstance(concat_content[1], Plus))
+        self.assertTrue(isinstance(concat_content[2], Symbol))
+        
+        star_content = concat_content[0].content
+        self.assertTrue(isinstance(star_content, Or))
+
+        or_content = star_content.content
+        self.assertTrue(isinstance(or_content, list))
+        self.assertEqual(3, len(or_content))
+        self.assertTrue(isinstance(or_content[0], Symbol))
+        self.assertTrue(isinstance(or_content[1], Symbol))
+        self.assertTrue(isinstance(or_content[2], Symbol))
+        self.assertEqual('a', or_content[0].content)
+        self.assertEqual('b', or_content[1].content)
+        self.assertEqual('c', or_content[2].content)
+
+        plus_content = concat_content[1].content
+        self.assertTrue(isinstance(plus_content, Concat))
+        concat2_content = plus_content.content
+        self.assertEqual(2, len(concat2_content))
+        self.assertTrue(isinstance(concat2_content[0], Symbol))
+        self.assertTrue(isinstance(concat2_content[1], Symbol))
+        self.assertEqual('d', concat2_content[0].content)
+        self.assertEqual('e', concat2_content[1].content)
+
+        self.assertEqual('f', concat_content[2].content)
+    
+    def test_ejemplo_dos_enunciado(self):
+        input_regex_tree = "{CONCAT}3\n"
+        input_regex_tree += "\t{OPT}\n"
+        input_regex_tree += "\t\t{CONCAT}4\n"
+        input_regex_tree += "\t\t\t-\n"
+        input_regex_tree += "\t\t\tA\n"
+        input_regex_tree += "\t\t\tB\n"
+        input_regex_tree += "\t\t\tC\n"
+        input_regex_tree += "\t{PLUS}\n"
+        input_regex_tree += "\t\t{OR}2\n"
+        input_regex_tree += "\t\t\t0\n"
+        input_regex_tree += "\t\t\t1\n"
+        input_regex_tree += "\t{STAR}\n"
+        input_regex_tree += "\t\t\\t\n"
+
+        tree = build_operand_tree(StringIO(input_regex_tree))
+
+        self.assertTrue(isinstance(tree, Concat))
+        self.assertTrue(isinstance(tree.content, list))
+        self.assertEqual(3, len(tree.content))
+        concat_content = tree.content
+        self.assertTrue(isinstance(concat_content[0], Opt))
+        self.assertTrue(isinstance(concat_content[1], Plus))
+        self.assertTrue(isinstance(concat_content[2], Star))
+        
+        opt_content = concat_content[0].content
+        self.assertTrue(isinstance(opt_content, Concat))
+
+        concat2_content = opt_content.content
+        self.assertTrue(isinstance(concat2_content, list))
+        self.assertEqual(4, len(concat2_content))
+        self.assertTrue(isinstance(concat2_content[0], Symbol))
+        self.assertTrue(isinstance(concat2_content[1], Symbol))
+        self.assertTrue(isinstance(concat2_content[2], Symbol))
+        self.assertTrue(isinstance(concat2_content[3], Symbol))
+        self.assertEqual('-', concat2_content[0].content)
+        self.assertEqual('A', concat2_content[1].content)
+        self.assertEqual('B', concat2_content[2].content)
+        self.assertEqual('C', concat2_content[3].content)
+
+        plus_content = concat_content[1].content
+        self.assertTrue(isinstance(plus_content, Or))
+        or_content = plus_content.content
+        self.assertEqual(2, len(or_content))
+        self.assertTrue(isinstance(or_content[0], Symbol))
+        self.assertTrue(isinstance(or_content[1], Symbol))
+        self.assertEqual('0', or_content[0].content)
+        self.assertEqual('1', or_content[1].content)
+
+        star_content = concat_content[2].content
+        self.assertTrue(isinstance(star_content, Symbol))
+        self.assertEqual('\\t', star_content.content)
 
 #class TestParseRegex(TestCase):
 #

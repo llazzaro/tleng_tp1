@@ -66,6 +66,86 @@ def load_automata(automata_file):
 
     return Automata(states, symbols, initial, finals)
 
+class Tree():
+	def __init__(self, content):
+		self.content = content
+
+	def to_automata(self):
+		pass
+
+class Symbol(Tree):
+	def __init__(self, content):
+		assert(isinstance(content, str))
+		Tree.__init__(self, content)
+
+	def to_automata(self):
+		raise NotImplementedError
+
+class Star(Tree):
+	def __init__(self, content):
+		assert(isinstance(content, Tree))
+		Tree.__init__(self, content)
+
+	def to_automata(self):
+		raise NotImplementedError
+
+class Plus(Tree):
+	def __init__(self, content):
+		assert(isinstance(content, Tree))
+		Tree.__init__(self, content)
+
+	def to_automata(self):
+		raise NotImplementedError
+
+class Opt(Tree):
+	def __init__(self, content):
+		assert(isinstance(content, Tree))
+		Tree.__init__(self, content)
+
+	def to_automata(self):
+		raise NotImplementedError
+
+class Or(Tree):
+	def __init__(self, content):
+		assert(isinstance(content, list))
+		assert(len(content) >= 2)
+		Tree.__init__(self, content)
+
+	def to_automata(self):
+		raise NotImplementedError
+
+class Concat(Tree):
+	def __init__(self, content):
+		assert(isinstance(content, list))
+		assert(len(content) >= 2)
+		Tree.__init__(self, content)
+
+	def to_automata(self):
+		raise NotImplementedError
+
+def build_operand_tree(tree_file):
+	line = tree_file.readline()
+	if '{CONCAT}' in line:
+		tabs, number_of_operands = line.split('{CONCAT}')
+		content = []
+		for i in range(int(number_of_operands)):
+			content.append(build_operand_tree(tree_file))
+		return Concat(content)
+	elif '{OR}' in line:
+		tabs, number_of_operands = line.split('{OR}')
+		content = []
+		for i in range(int(number_of_operands)):
+			content.append(build_operand_tree(tree_file))
+		return Or(content)
+	elif '{OPT}' in line:
+		return Opt(build_operand_tree(tree_file))
+	elif '{PLUS}' in line:
+		return Plus(build_operand_tree(tree_file))
+	elif '{STAR}' in line:
+		depth = line.count('\t')
+		return Star(build_operand_tree(tree_file))
+	else:
+		return Symbol(line.strip())
 
 def verify_integrity(res):
     """
