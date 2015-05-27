@@ -29,11 +29,27 @@ class TestEjercicioA(TestCase):
 
         self.assertTrue(dfa_automata.is_deterministic())
         self.assertFalse(nfa_automata.is_deterministic())
-        self.assertEquals(len(dfa_automata.states), 4)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('b') in dfa_automata.finals)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('a') == dfa_automata.initial.transition('a'))
-        self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('a') not in dfa_automata.finals)
-        self.assertTrue(dfa_automata.initial.transition('a').transition('a').transition('b') in dfa_automata.finals)
+
+        self.assertEqual(nfa_automata.symbols, dfa_automata.symbols)
+        self.assertEqual(len(dfa_automata.states), 4)
+
+        q0 = dfa_automata.state_by_name("q0")
+        q1 = dfa_automata.state_by_name("q1")
+        q2 = dfa_automata.state_by_name("q2") # Este básicamente es trampa
+        q3 = dfa_automata.state_by_name("q3")
+
+        self.assertEqual(q0, dfa_automata.initial)
+        self.assertEqual([q3], dfa_automata.finals)
+
+        self.assertEqual(q1, q0.transition('a'))
+        self.assertEqual(q2, q0.transition('b'))
+        self.assertEqual(q1, q1.transition('a'))
+        self.assertEqual(q3, q1.transition('b'))
+        self.assertEqual(q2, q2.transition('a'))
+        self.assertEqual(q2, q2.transition('b'))
+        self.assertEqual(q2, q3.transition('a'))
+        self.assertEqual(q2, q3.transition('b'))
+
 
     def test_simple_nfa_to_dfa_other(self):
         """
