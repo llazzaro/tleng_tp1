@@ -279,6 +279,7 @@ class TestBuildOperandTree(TestCase):
             tree = build_operand_tree(StringIO(input_regex_tree))
 
     #Esto no lo podemos detectar, aunque el árbol que construímos queda consistente.
+    #Simplemente se ignora la última línea.
     @unittest.expectedFailure 
     def test__too_many_subexpressions_single_expected(self):
         input_regex_tree = "{STAR}\n"
