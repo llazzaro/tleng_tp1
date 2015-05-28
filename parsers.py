@@ -212,7 +212,10 @@ class Concat(Tree):
         return Automata(states, list(set(symbols)), content_automatas[0].initial, content_automatas[-1].finals)
 
 def build_operand_tree(tree_file):
-    return build_operand_tree_with_depth(tree_file, 0)
+    tree = build_operand_tree_with_depth(tree_file, 0)
+    if tree_file.readline() != '':
+        raise Exception("Cargué un árbol sin leer todo el archivo.")
+    return tree
 
 def build_operand_tree_with_depth(tree_file, depth):
     line = tree_file.readline()

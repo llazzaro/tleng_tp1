@@ -319,13 +319,20 @@ class TestBuildOperandTree(TestCase):
         with self.assertRaises(ValueError):
             tree = build_operand_tree(StringIO(input_regex_tree))
 
-    #Esto no lo podemos detectar, aunque el árbol que construímos queda consistente.
-    #Simplemente se ignora la última línea.
-    @unittest.expectedFailure 
-    def test__too_many_subexpressions_single_expected(self):
+    def test__too_many_subexpressions_single_expected_eof(self):
         input_regex_tree = "{STAR}\n"
         input_regex_tree += "\tA\n"
         input_regex_tree += "\tB\n"
+
+        with self.assertRaises(Exception):
+            tree = build_operand_tree(StringIO(input_regex_tree))
+
+    def test__too_many_subexpressions_than_expected_no_EOF(self):
+        input_regex_tree = "{CONCAT}2\n"
+        input_regex_tree += "\t{STAR}\n"
+        input_regex_tree += "\t\tA\n"
+        input_regex_tree += "\t\tB\n"
+        input_regex_tree += "\tC\n"
 
         with self.assertRaises(Exception):
             tree = build_operand_tree(StringIO(input_regex_tree))
