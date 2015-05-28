@@ -4,6 +4,31 @@ import string
 from models import Automata, Node, LAMBDA
 from collections import defaultdict
 
+def is_valid_char(char):
+    return char == '\\t' or char in string.letters + string.digits + '([,:;.¿?!¡()"\&-]' + "'"
+
+def parse_transition_line(transition_line, states):
+    transition = transition_line.split('\t')
+    tr_src_name = transition[0]
+    tr_sym = transition[1]
+    tr_tgt_name = transition[2].strip('\n')
+
+    tr_src_state = None
+    tr_tgt_state = None
+
+    for state in states:
+        if tr_src_state is None and state.name == tr_src_name:
+            tr_src_state = state
+        if tr_tgt_state is None and state.name == tr_tgt_name:
+            tr_tgt_state = state
+
+    if tr_src_state is None:
+        raise Exception('Formato invalido. La transición {0} --{1}--> {2} parte de un estado que no está en la lista: {3}'.format(tr_src_name, tr_sym, tr_tgt_name, states))
+    if tr_tgt_state is None:
+        raise Exception('Formato invalido. La transición {0} --{1}--> {2} va a un estado que no está en la lista: {3}'.format(tr_src_name, tr_sym, tr_tgt_name, states))
+
+    tr_src_state.add_transition(tr_sym, tr_tgt_state)
+
 
 def load_automata(automata_file):
     states_line = automata_file.readline()
@@ -35,34 +60,20 @@ def load_automata(automata_file):
     for final_state_name in finals_line.split('\t'):
         final_state_name = final_state_name.strip('\n')
         if final_state_name not in valid_state_names:
-            raise Exception('Formato invalido. Estado final {0} esta en la lista de estados validos {1}'.format(final_state_name, states))
+            if is_valid_char(final_state_name):
+                # No hay finales y es la primer transición!!
+                parse_transition_line(finals_line, states)
+                finals = []
+                break;
+            else:
+                raise Exception('Formato invalido. Estado final {0} esta en la lista de estados validos {1}'.format(final_state_name, states))
         else:
             for state in states:
                 if state.name == final_state_name.strip('\n'):
                     finals.append(state)
 
     for transition_line in automata_file:
-        transition = transition_line.split('\t')
-        tr_src_name = transition[0]
-        tr_sym = transition[1]
-        tr_tgt_name = transition[2].strip('\n')
-
-        tr_src_state = None
-        tr_tgt_state = None
-
-        for state in states:
-            # aprint state.name
-            if tr_src_state is None and state.name == tr_src_name:
-                tr_src_state = state
-            if tr_tgt_state is None and state.name == tr_tgt_name:
-                tr_tgt_state = state
-
-        if tr_src_state is None:
-            raise Exception('Formato invalido. La transición {0} --{1}--> {2} parte de un estado que no está en la lista: {3}'.format(tr_src_name, tr_sym, tr_tgt_name, states))
-        if tr_tgt_state is None:
-            raise Exception('Formato invalido. La transición {0} --{1}--> {2} va a un estado que no está en la lista: {3}'.format(tr_src_name, tr_sym, tr_tgt_name, states))
-
-        tr_src_state.add_transition(tr_sym, tr_tgt_state)
+        parse_transition_line(transition_line, states)
 
     return Automata(states, symbols, initial, finals)
 
@@ -79,7 +90,7 @@ class Symbol(Tree):
             raise TypeError
         if len(content) > 1 and content[0] != '\\':
             raise ValueError
-        if content != '\\t' and content not in string.letters + string.digits + '([,:;.¿?!¡()"\&-]' + "'":
+        if not is_valid_char(content):
             raise ValueError
 
         Tree.__init__(self, content)

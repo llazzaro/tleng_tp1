@@ -94,6 +94,47 @@ class TestParseAutomata(TestCase):
         with self.assertRaises(Exception):
             load_automata(file_input)
 
+    def test_archivo_automata__sin_estados_finales(self):
+        input_text = 'q0\n'
+        input_text += 'a\n'
+        input_text += 'q0\n'
+        input_text += 'q0\ta\tq0'
+
+        file_input = StringIO(input_text)
+
+        automata = load_automata(file_input)
+
+        self.assertEqual(len(automata.states), 1)
+        self.assertEqual(automata.symbols, ['a'])
+
+        q0 = automata.state_by_name("q0")
+
+        self.assertEqual(automata.initial, q0)
+        self.assertEqual(automata.finals, [])
+
+        self.assertEqual(q0.transitions.keys(), ['a'])
+        self.assertEqual(q0.transitions['a'], [q0])
+
+    def test_archivo_automata__sin_transiciones(self):
+        input_text = 'q0\n'
+        input_text += 'a\n'
+        input_text += 'q0\n'
+        input_text += 'q0\n'
+
+        file_input = StringIO(input_text)
+
+        automata = load_automata(file_input)
+
+        self.assertEqual(len(automata.states), 1)
+        self.assertEqual(automata.symbols, ['a'])
+
+        q0 = automata.state_by_name("q0")
+
+        self.assertEqual(automata.initial, q0)
+        self.assertEqual(automata.finals, [q0])
+
+        self.assertEqual(q0.transitions.keys(), [])
+
 
 class TestBuildOperandTree(TestCase):
     def test_only_symbol(self):
