@@ -266,6 +266,53 @@ class TestBuildOperandTree(TestCase):
         self.assertTrue(isinstance(star_content, Symbol))
         self.assertEqual('\\t', star_content.content)
 
+    def test__too_many_characters(self):
+        input_regex_tree = '*s'
+        
+        with self.assertRaises(ValueError):
+            tree = build_operand_tree(StringIO(input_regex_tree))
+    
+    def test__invalid_characters(self):
+        input_regex_tree = '*'
+        
+        with self.assertRaises(ValueError):
+            tree = build_operand_tree(StringIO(input_regex_tree))
+
+    #Esto no lo podemos detectar, aunque el árbol que construímos queda consistente.
+    @unittest.expectedFailure 
+    def test__too_many_subexpressions_single_expected(self):
+        input_regex_tree = "{STAR}\n"
+        input_regex_tree += "\tA\n"
+        input_regex_tree += "\tB\n"
+
+        with self.assertRaises(Exception):
+            tree = build_operand_tree(StringIO(input_regex_tree))
+
+    def test__not_enough_subexpressions(self):
+        input_regex_tree = "{CONCAT}1\n"
+        input_regex_tree += "\tA\n"
+
+        with self.assertRaises(Exception):
+            tree = build_operand_tree(StringIO(input_regex_tree))
+
+    def test__less_subexpressions_than_expected_EOF(self):
+        input_regex_tree = "{CONCAT}3\n"
+        input_regex_tree += "\tA\n"
+        input_regex_tree += "\tB\n"
+
+        with self.assertRaises(Exception):
+            tree = build_operand_tree(StringIO(input_regex_tree))
+
+    def test__less_subexpressions_than_expected_no_EOF(self):
+        input_regex_tree = "{CONCAT}2\n"
+        input_regex_tree += "\t{CONCAT}3\n"
+        input_regex_tree += "\t\tA\n"
+        input_regex_tree += "\t\tB\n"
+        input_regex_tree += "\tC\n"
+
+        with self.assertRaises(Exception):
+            tree = build_operand_tree(StringIO(input_regex_tree))
+
 class TestRegexTreeToNFA(TestCase):
     def test_symbol_to_automata(self):
         tree = Symbol('a')

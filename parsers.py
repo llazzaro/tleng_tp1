@@ -75,7 +75,13 @@ class Tree():
 
 class Symbol(Tree):
     def __init__(self, content):
-        assert(isinstance(content, str))
+        if not isinstance(content, str):
+            raise TypeError
+        if len(content) > 1 and content[0] != '\\':
+            raise ValueError
+        if content != '\\t' and content not in string.letters + string.digits + '([,:;.¿?!¡()"\&-]' + "'":
+            raise ValueError
+
         Tree.__init__(self, content)
 
     def to_automata(self):
@@ -86,7 +92,9 @@ class Symbol(Tree):
 
 class Star(Tree):
     def __init__(self, content):
-        assert(isinstance(content, Tree))
+        if not isinstance(content, Tree):
+            raise TypeError
+
         Tree.__init__(self, content)
 
     def to_automata(self):
@@ -105,7 +113,9 @@ class Star(Tree):
 
 class Plus(Tree):
     def __init__(self, content):
-        assert(isinstance(content, Tree))
+        if not isinstance(content, Tree):
+            raise TypeError
+
         Tree.__init__(self, content)
 
     def to_automata(self):
@@ -113,7 +123,9 @@ class Plus(Tree):
 
 class Opt(Tree):
     def __init__(self, content):
-        assert(isinstance(content, Tree))
+        if not isinstance(content, Tree):
+            raise TypeError
+
         Tree.__init__(self, content)
 
     def to_automata(self):
@@ -129,13 +141,18 @@ class Opt(Tree):
 
         return Automata(states, content_automata.symbols, q0, [qf])
         
-
 class Or(Tree):
     def __init__(self, content):
-        assert(isinstance(content, list))
-        assert(len(content) >= 2)
+        if not isinstance(content, list):
+            raise TypeError
+
+        if not len(content) >= 2:
+            raise Exception("Or without enough operands")
+
         for t in content:
-            assert(isinstance(t, Tree))
+            if not isinstance(t, Tree):
+                raise TypeError
+
         Tree.__init__(self, content)
 
     def to_automata(self):
@@ -157,10 +174,16 @@ class Or(Tree):
 
 class Concat(Tree):
     def __init__(self, content):
-        assert(isinstance(content, list))
-        assert(len(content) >= 2)
+        if not isinstance(content, list):
+            raise TypeError
+
+        if not len(content) >= 2:
+            raise Exception("Concat without enough operands")
+
         for t in content:
-            assert(isinstance(t, Tree))
+            if not isinstance(t, Tree):
+                raise TypeError
+
         Tree.__init__(self, content)
 
     def to_automata(self):
@@ -178,26 +201,36 @@ class Concat(Tree):
         return Automata(states, list(set(symbols)), content_automatas[0].initial, content_automatas[-1].finals)
 
 def build_operand_tree(tree_file):
+    return build_operand_tree_with_depth(tree_file, 0)
+
+def build_operand_tree_with_depth(tree_file, depth):
     line = tree_file.readline()
+    if len('line') == '':
+        raise Exception("Fin de archivo inesperado")
+    if line.count("\t") != depth:
+        raise Exception("Árbol mal definido, esperaba {0} tabs y encontré {1}".format(depth, line.count("\t")))
+
     if '{CONCAT}' in line:
         tabs, number_of_operands = line.split('{CONCAT}')
+        number_of_operands = int(number_of_operands.strip())
         content = []
         for i in range(int(number_of_operands)):
-            content.append(build_operand_tree(tree_file))
+            content.append(build_operand_tree_with_depth(tree_file, depth + 1))
         return Concat(content)
     elif '{OR}' in line:
         tabs, number_of_operands = line.split('{OR}')
+        number_of_operands = int(number_of_operands.strip())
         content = []
         for i in range(int(number_of_operands)):
-            content.append(build_operand_tree(tree_file))
+            content.append(build_operand_tree_with_depth(tree_file, depth + 1))
         return Or(content)
     elif '{OPT}' in line:
-        return Opt(build_operand_tree(tree_file))
+        return Opt(build_operand_tree_with_depth(tree_file, depth + 1))
     elif '{PLUS}' in line:
-        return Plus(build_operand_tree(tree_file))
+        return Plus(build_operand_tree_with_depth(tree_file, depth + 1))
     elif '{STAR}' in line:
         depth = line.count('\t')
-        return Star(build_operand_tree(tree_file))
+        return Star(build_operand_tree_with_depth(tree_file, depth + 1))
     else:
         return Symbol(line.strip())
 
