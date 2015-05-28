@@ -23,10 +23,12 @@ class TestEjercicioE(TestCase):
 
         automata_complemento = afd_complemento(automata)
 
+        not_final_states_set = set(automata.states) - set(automata.finals)
+        
         self.assertEqual(len(automata.states), len(automata_complemento.states) - 1) # agregué el trampa
         self.assertEqual(automata.initial, automata_complemento.initial)
-        # Este test está incompleto por parche a último momento.
-        #self.assertEqual(set(automata.states) - set(automata.finals), set(automata_complemento.finals))
+        self.assertEqual(not_final_states_set, set(automata_complemento.finals) & not_final_states_set)
+        self.assertEqual(len(not_final_states_set) + 1, len(automata_complemento.finals))
     
     
 
