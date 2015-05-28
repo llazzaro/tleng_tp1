@@ -163,6 +163,28 @@ class Automata:
 
         return res
 
+    def remove_terminal_node(self):
+        # Saco el estado trampa
+        terminal_node = None
+        for state in self.states:
+
+            terminal = state not in self.finals
+
+            for a in state.transitions.keys():
+                terminal = terminal and state.transition(a) == state
+
+            if terminal:
+                terminal_node = state
+                break
+
+        if terminal_node != None:
+            for state in self.states:
+                for a in state.transitions.keys():
+                    if state.transition(a) == terminal_node:
+                        state.transitions.pop(a)
+            self.states.remove(terminal_node)
+
+
 
 def minimize(automata):
     current_partition={}
@@ -214,27 +236,10 @@ def minimize(automata):
             else:
                 ms.add_transition(a, target_node)
 
-    # Saco el estado trampa
-    terminal_node = None
-    for state in min_states:
+    res = Automata(min_states, automata.symbols, min_initial, min_finals)
+    res.remove_terminal_node()
 
-        terminal = state not in min_finals
-
-        for a in state.transitions.keys():
-            terminal = terminal and state.transition(a) == state
-
-        if terminal:
-            terminal_node = state
-            break
-
-    if terminal_node != None:
-        for state in min_states:
-            for a in state.transitions.keys():
-                if state.transition(a) == terminal_node:
-                    state.transitions.pop(a)
-        min_states.remove(terminal_node)
-
-    return Automata(min_states, automata.symbols, min_initial, min_finals)
+    return res
 
 
 def add_terminal_node(automata):

@@ -1,11 +1,11 @@
-# -*- coding: utf-8 -*- 
 #!/usr/bin/python
+# -*- coding: utf-8 -*- 
 
 from itertools import product
 
 from parsers import load_automata
 from writers import save_automata
-from models import Automata, Node, minimize
+from models import *
 
 class IncompatibleAlphabetsError(Exception):
     pass
@@ -21,14 +21,10 @@ def interseccion(archivo_automata1, archivo_automata2, archivo_automata):
 
 
 def afd_interseccion(automata1, automata2):
-    #FIXME: Esto está marcado como error por la materia
-    if automata1.symbols != automata2.symbols:
-        raise IncompatibleAlphabetsError
-
     if not (automata1.is_deterministic() and automata2.is_deterministic()):
         raise NonDeterministicAutomataError
 
-    symbols = automata1.symbols
+    symbols = list(set(automata1.symbols + automata2.symbols))
 
     #Creo un estado para cada par de estados en los dos autómatas originales
     state_product_list = list(product(automata1.states, automata2.states))
@@ -48,5 +44,6 @@ def afd_interseccion(automata1, automata2):
     intersection_automata = Automata(state_product.values(), symbols, state_product[(automata1.initial, automata2.initial)], intersection_finals)
     intersection_automata.prune_unreachable_states()
 
-    return intersection_automata
-    #return minimize(intersection_automata)
+    #return intersection_automata
+    intersection_with_terminal = add_terminal_node(intersection_automata)
+    return minimize(intersection_with_terminal)
