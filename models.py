@@ -66,6 +66,9 @@ class Automata:
         self.initial = initial
         self.current_state = initial
 
+        if LAMBDA in symbols:
+            raise ValueError("LAMBDA no se puede tener en symbols")
+
         if (type(states) != list):
             raise TypeError("states no es lista")
 
@@ -107,7 +110,10 @@ class Automata:
         raise ValueError('State not found')
 
     def has_lambda(self):
-        return LAMBDA in self.symbols
+        for state in self.states:
+            if LAMBDA in state.transitions:
+                return True
+        return False
 
     def is_lambda_deterministic(self):
         res = True

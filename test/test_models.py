@@ -158,13 +158,16 @@ class TestAutomata(TestCase):
         other_node.add_transition(LAMBDA, final)
 
         states = [initial, final, other_node]
-        symbols = ['a', LAMBDA]
+        symbols = ['a']
         automata = Automata(states, symbols, initial, [final])
 
         self.assertEqual(states, automata.states)
         self.assertEqual(symbols, automata.symbols)
         self.assertEqual(initial, automata.initial)
         self.assertEqual([final], automata.finals)
+
+        self.assertFalse(automata.is_deterministic())
+        self.assertTrue(automata.has_lambda())
 
     def test_construction_automata__unexpected_symbol(self):
         initial = Node()
@@ -209,9 +212,10 @@ class TestAutomata(TestCase):
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
         other_node.add_transition(LAMBDA, final)
-        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertFalse(automata.is_deterministic())
+        self.assertTrue(automata.has_lambda())
 
     def test_is_deterministic_automata__not_det(self):
         initial = Node()
@@ -222,6 +226,7 @@ class TestAutomata(TestCase):
         automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertFalse(automata.is_deterministic())
+        self.assertFalse(automata.has_lambda())
 
     def test_is_deterministic_automata__lambda_det(self):
         initial = Node()
@@ -229,9 +234,10 @@ class TestAutomata(TestCase):
         other_node = Node()
         initial.add_transition(LAMBDA, other_node)
         initial.add_transition('a', final)
-        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertFalse(automata.is_deterministic())
+        self.assertTrue(automata.has_lambda())
 
     def test_is_deterministic_automata__det(self):
         initial = Node()
@@ -241,6 +247,7 @@ class TestAutomata(TestCase):
         automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertTrue(automata.is_deterministic())
+        self.assertFalse(automata.has_lambda())
 
     def test_is_lambda_deterministic_automata__lambda_not_det(self):
         initial = Node()
@@ -249,9 +256,10 @@ class TestAutomata(TestCase):
         initial.add_transition('a', other_node)
         initial.add_transition('a', final)
         other_node.add_transition(LAMBDA, final)
-        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertFalse(automata.is_lambda_deterministic())
+        self.assertTrue(automata.has_lambda())
 
     def test_is_lambda_deterministic_automata_not_det(self):
         initial = Node()
@@ -262,6 +270,7 @@ class TestAutomata(TestCase):
         automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertFalse(automata.is_lambda_deterministic())
+        self.assertFalse(automata.has_lambda())
 
     def test_is_lambda_deterministic_automata__lambda_det(self):
         initial = Node()
@@ -269,9 +278,10 @@ class TestAutomata(TestCase):
         other_node = Node()
         initial.add_transition(LAMBDA, other_node)
         initial.add_transition('a', final)
-        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertTrue(automata.is_lambda_deterministic())
+        self.assertTrue(automata.has_lambda())
 
     def test_is_lambda_deterministic_automata__det(self):
         initial = Node()
@@ -279,9 +289,10 @@ class TestAutomata(TestCase):
         other_node = Node()
         initial.add_transition(LAMBDA, other_node)
         initial.add_transition('a', final)
-        automata = Automata([initial, final, other_node], ['a', LAMBDA], initial, [final])
+        automata = Automata([initial, final, other_node], ['a'], initial, [final])
 
         self.assertTrue(automata.is_lambda_deterministic())
+        self.assertTrue(automata.has_lambda())
 
     def test_get_by_name__existing(self):
         q0 = Node("q0")
