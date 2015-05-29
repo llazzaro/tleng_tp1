@@ -5,8 +5,17 @@ import unittest
 from unittest import TestCase
 
 from StringIO import StringIO
-from models import *
+from models import (
+    Node,
+    LAMBDA,
+    Automata,
+    UnexpectedSymbolOnStateException,
+    FinalsNotInStatesException,
+    add_terminal_node,
+    minimize,
+)
 from parsers import load_automata
+
 
 class TestNode(TestCase):
     def test_construccion_node__with_name(self):
@@ -22,18 +31,16 @@ class TestNode(TestCase):
         self.assertEqual('q{0}'.format(Node.NODE_INDEX - 1), n.name)
         self.assertEqual({}, n.transitions)
 
-
     def test_add_transition__new_symbol(self):
         tested = Node()
         target = Node()
         s = 'a'
 
-        self.assertFalse(tested.transitions.has_key(s))
+        self.assertFalse(s in tested.transitions)
         tested.add_transition(s, target)
 
-        self.assertTrue(tested.transitions.has_key(s))
+        self.assertTrue(s in tested.transitions)
         self.assertEqual([target], tested.transitions[s])
-
 
     def test_add_transition__existing_symbol(self):
         tested = Node()
@@ -140,6 +147,7 @@ class TestNode(TestCase):
 
         self.assertTrue(tested.is_deterministic())
 
+
 class TestAutomata(TestCase):
     def test_construction_automata__ok(self):
         initial = Node()
@@ -153,8 +161,7 @@ class TestAutomata(TestCase):
         symbols = ['a', LAMBDA]
         automata = Automata(states, symbols, initial, [final])
 
-
-        self.assertEqual(states,  automata.states)
+        self.assertEqual(states, automata.states)
         self.assertEqual(symbols, automata.symbols)
         self.assertEqual(initial, automata.initial)
         self.assertEqual([final], automata.finals)
@@ -171,7 +178,7 @@ class TestAutomata(TestCase):
         symbols = ['a']
 
         with self.assertRaises(UnexpectedSymbolOnStateException):
-            automata = Automata(states, symbols, initial, [final])
+            Automata(states, symbols, initial, [final])
 
     def test_construction_automata__invalid_final(self):
         initial = Node()
@@ -182,7 +189,7 @@ class TestAutomata(TestCase):
         symbols = ['a']
 
         with self.assertRaises(FinalsNotInStatesException):
-            automata = Automata(states, symbols, initial, [Node()])
+            Automata(states, symbols, initial, [Node()])
 
     def test_construction_automata__extra_final(self):
         initial = Node()
@@ -193,7 +200,7 @@ class TestAutomata(TestCase):
         symbols = ['a']
 
         with self.assertRaises(FinalsNotInStatesException):
-            automata = Automata(states, symbols, initial, [final, Node()])
+            Automata(states, symbols, initial, [final, Node()])
 
     def test_is_deterministic_automata__lambda_not_det(self):
         initial = Node()
@@ -283,7 +290,7 @@ class TestAutomata(TestCase):
 
         self.assertEqual(q0, automata.state_by_name("q0"))
 
-    def test_get_by_name__existing(self):
+    def test_get_by_name__existing_2(self):
         q0 = Node("q0")
 
         automata = Automata([q0], ['a'], q0, [q0])
@@ -379,6 +386,7 @@ class TestModels(TestCase):
         self.assertEqual([qT], qT.transitions['a'])
         self.assertEqual([qT], qT.transitions['b'])
 
+
 class TestMinimize(TestCase):
     def test_minimize__ejemplo_clase(self):
         q0 = Node('q0')
@@ -430,7 +438,7 @@ class TestMinimize(TestCase):
         self.assertEqual([q3], q3.transitions['a'])
         self.assertEqual([q3], q3.transitions['b'])
 
-    #FIXME: reescribir evitando el load_automata y rechequeando
+    # FIXME: reescribir evitando el load_automata y rechequeando
     def test_minimize__example_from_hopcroft(self):
         """
             basado en la figura 4.10 del libro
@@ -497,16 +505,15 @@ class TestMinimize(TestCase):
 
         q0 = minimized.state_by_name("q0")
         q1 = minimized.state_by_name("q1")
-        
+
         self.assertEqual(q0, minimized.initial)
         self.assertEqual([q1], minimized.finals)
-        
+
         self.assertEqual(q0, q0.transition('0'))
         self.assertEqual(q1, q0.transition('1'))
         self.assertEqual(q1, q1.transition('0'))
 
-
-    #FIXME: reescribir evitando el load_automata y rechequeando
+    # FIXME: reescribir evitando el load_automata y rechequeando
     def test_minimize_hopcroft_figure_4_8(self):
         input_automata = '\t'.join(['a', 'b', 'c', 'd', 'e', 'f', 'g', 'h']) + '\n'
         input_automata += '0\t1\n'
@@ -539,7 +546,6 @@ class TestMinimize(TestCase):
         self.assertTrue(minimized.initial.transition('0').transition('1') in minimized.finals)
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
         self.assertEquals(minimized.initial.transition('1').transition('1').transition('1'), minimized.initial)
-
 
 
 if __name__ == '__main__':
