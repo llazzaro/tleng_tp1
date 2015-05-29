@@ -1,15 +1,11 @@
 #!/usr/bin/python
 # -*- coding: utf-8 -*-
 
-import os
 import unittest
 from unittest import TestCase
-from StringIO import StringIO
 
-from models import Node, Automata, LAMBDA, minimize
+from models import Node, Automata, LAMBDA
 from ejercicio_a import nfa_to_dfa
-from parsers import load_automata
-from writers import save_dot
 
 
 class TestEjercicioA(TestCase):
@@ -35,7 +31,7 @@ class TestEjercicioA(TestCase):
 
         q0 = dfa_automata.state_by_name("q0")
         q1 = dfa_automata.state_by_name("q1")
-        q2 = dfa_automata.state_by_name("q2") # Este básicamente es trampa
+        q2 = dfa_automata.state_by_name("q2")  # Este básicamente es trampa
         q3 = dfa_automata.state_by_name("q3")
 
         self.assertEqual(q0, dfa_automata.initial)
@@ -49,7 +45,6 @@ class TestEjercicioA(TestCase):
         self.assertEqual(q2, q2.transition('b'))
         self.assertEqual(q2, q3.transition('a'))
         self.assertEqual(q2, q3.transition('b'))
-
 
     def test_simple_nfa_to_dfa_other(self):
         """
@@ -82,7 +77,7 @@ class TestEjercicioA(TestCase):
 
         q0 = dfa_automata.state_by_name("q0")
         q1 = dfa_automata.state_by_name("q1")
-        q2 = dfa_automata.state_by_name("q2") # Este básicamente es trampa
+        q2 = dfa_automata.state_by_name("q2")  # Este básicamente es trampa
         q3 = dfa_automata.state_by_name("q3")
         q4 = dfa_automata.state_by_name("q4")
         q5 = dfa_automata.state_by_name("q5")
@@ -111,7 +106,6 @@ class TestEjercicioA(TestCase):
         self.assertEqual(q2, q7.transition('b'))
         self.assertEqual(q3, q8.transition('a'))
         self.assertEqual(q8, q8.transition('b'))
-
 
     def test_convert_nfa_to_dfa_from_hopcroft(self):
         """
