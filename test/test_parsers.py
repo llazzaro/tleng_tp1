@@ -387,12 +387,16 @@ class TestRegexTreeToNFA(TestCase):
         self.assertEqual(['a'], tested.symbols)
         self.assertEqual(4, len(tested.states))
 
-        # FIXME: Mal testeo
         dfa_tested = nfa_to_dfa(tested)
-        self.assertTrue(dfa_tested.accepts(""))
-        self.assertTrue(dfa_tested.accepts("a"))
-        self.assertTrue(dfa_tested.accepts("aa"))
-        self.assertTrue(dfa_tested.accepts("aaa"))
+        q0 = dfa_tested.state_by_name("q0")
+        q1 = dfa_tested.state_by_name("q1")
+
+        q1 = dfa_tested.state_by_name("q1")
+        self.assertEquals(dfa_tested.initial, q0)
+        self.assertEquals(set([q1, q0]), set(dfa_tested.finals))
+
+        self.assertEqual(q1, q0.transition('a'))
+        self.assertEqual(q1, q1.transition('a'))
 
     def test_plus_to_automata(self):
         tree = Plus(Symbol('a'))
@@ -401,12 +405,19 @@ class TestRegexTreeToNFA(TestCase):
         self.assertEqual(['a'], tested.symbols)
         # self.assertEqual(4, len(tested.states))
 
-        # FIXME: Mal testeo
         dfa_tested = nfa_to_dfa(tested)
-        self.assertFalse(dfa_tested.accepts(""))
-        self.assertTrue(dfa_tested.accepts("a"))
-        self.assertTrue(dfa_tested.accepts("aa"))
-        self.assertTrue(dfa_tested.accepts("aaa"))
+        self.assertTrue(dfa_tested.is_deterministic())
+        q0 = dfa_tested.state_by_name("q0")
+        q1 = dfa_tested.state_by_name("q1")
+        q2 = dfa_tested.state_by_name("q2")
+
+        self.assertTrue(q0 not in dfa_tested.finals)
+        self.assertTrue(q1 in dfa_tested.finals)
+        self.assertTrue(q2 in dfa_tested.finals)
+
+        self.assertEqual(q1, q0.transition('a'))
+        self.assertEqual(q2, q1.transition('a'))
+        self.assertEqual(q2, q2.transition('a'))
 
     def test_opt_to_automata(self):
         tree = Opt(Symbol('a'))
