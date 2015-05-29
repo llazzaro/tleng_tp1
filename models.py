@@ -183,7 +183,7 @@ class Automata:
                 terminal_node = state
                 break
 
-        if terminal_node != None:
+        if terminal_node is not None:
             for state in self.states:
                 for a in state.transitions.keys():
                     if state.transition(a) == terminal_node:
@@ -191,15 +191,15 @@ class Automata:
             self.states.remove(terminal_node)
 
 
-
 def minimize(automata):
+    automata = add_terminal_node(automata)
     current_partition={}
     for state in automata.states:
         current_partition[state] = 1 if state in automata.finals else 0
 
     previous_partition = None
     while current_partition != previous_partition:
-        last_prev_partition = current_partition[automata.initial]
+        # last_prev_partition = current_partition[automata.initial]  # comente la linea, no se usa
         previous_partition = current_partition.copy()
 
         process = {}
@@ -212,7 +212,7 @@ def minimize(automata):
         current_label = 0
         partition_label = {}
         for state in automata.states:
-            part_list = str(process[state]) # En realidad debiera hacer un implode, pero para el caso es lo mismo
+            part_list = str(process[state])  # En realidad debiera hacer un implode, pero para el caso es lo mismo
             if part_list not in partition_label.keys():
                 partition_label[part_list] = current_label
                 current_label += 1
@@ -226,18 +226,18 @@ def minimize(automata):
     min_finals = []
 
     for s in automata.states:
-        ms = min_states_dict[ current_partition[s] ]
+        ms = min_states_dict[current_partition[s]]
 
         if s == automata.initial:
-            assert(min_initial == None or min_initial == ms)
+            assert(min_initial is None or min_initial == ms)
             min_initial = ms
 
         if s in automata.finals and ms not in min_finals:
             min_finals.append(ms)
 
         for a in automata.symbols:
-            target_node = min_states_dict[ current_partition[ s.transitions[a][0] ] ]
-            if ms.transitions.has_key(a):
+            target_node = min_states_dict[current_partition[s.transitions[a][0]]]
+            if a in ms.transitions:
                 assert(ms.transitions[a][0] == target_node)
             else:
                 ms.add_transition(a, target_node)
@@ -271,4 +271,3 @@ def add_terminal_node(automata):
     states.append(terminal)
 
     return Automata(states, automata.symbols, initial, finals)
-

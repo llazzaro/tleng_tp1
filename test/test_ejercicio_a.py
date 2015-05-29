@@ -3,9 +3,10 @@
 
 import unittest
 from unittest import TestCase
+from StringIO import StringIO
 
 from models import Node, Automata, LAMBDA
-from ejercicio_a import nfa_to_dfa
+from ejercicio_a import nfa_to_dfa, afd_minimo
 
 
 class TestEjercicioA(TestCase):
@@ -190,8 +191,8 @@ class TestEjercicioA(TestCase):
         self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('a') == dfa_automata.initial.transition('a').transition('a'))
         self.assertTrue(dfa_automata.initial.transition('a').transition('b').transition('b') == dfa_automata.initial.transition('a').transition('a'))
 
-	# FIXME Desactivado porque no existe ese archivo
-    #def test_minimize_caso_regex_enunciado(self):
+    # FIXME Desactivado porque no existe ese archivo
+    # def test_minimize_caso_regex_enunciado(self):
     #    current_dir = os.path.dirname(os.path.abspath(__file__))
     #    input_file = open(os.path.join(current_dir, 'automata_pruebas.aut'), 'r')
 
@@ -204,6 +205,19 @@ class TestEjercicioA(TestCase):
     #    self.assertEquals(minimized.symbols, automata.symbols)
     #    self.assertEquals(len(minimized.states), 8)
     #    self.assertTrue(LAMBDA not in minimized.symbols)
+
+
+class TestCompletoInputOutput(TestCase):
+
+    def test_only_symbol(self):
+        input_regex_tree = 'a'
+        file_input = StringIO(input_regex_tree)
+        file_output = StringIO()
+        afd_minimo(file_input, file_output)
+        file_output.seek(0)
+        result = file_output.read()
+
+        self.assertEquals(result, 'q0\tq1\na\nq0\nq1\nq0\ta\tq1\n')
 
 
 if __name__ == '__main__':

@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 #!/usr/bin/env python
 
-import itertools
 from Queue import Queue
 from models import Automata, LAMBDA, Node, minimize
 from parsers import regex_to_automata
