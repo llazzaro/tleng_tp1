@@ -4,8 +4,16 @@ import unittest
 from unittest import TestCase
 from StringIO import StringIO
 
-from parsers import *
-from models import LAMBDA, minimize
+from parsers import (
+    load_automata,
+    build_operand_tree,
+    Symbol,
+    Concat,
+    Or,
+    Star,
+    Plus,
+    Opt
+)
 from ejercicio_a import nfa_to_dfa
 
 
@@ -38,13 +46,12 @@ class TestParseAutomata(TestCase):
 
         self.assertEqual(q0.transitions.keys(), ['a'])
         self.assertEqual(q0.transitions['a'], [q1])
-        #Convierto a set para ignorar el orden en la lista
+        # Convierto a set para ignorar el orden en la lista
         self.assertEqual(set(q1.transitions.keys()), set(['b', 'c']))
         self.assertEqual(q1.transitions['b'], [q2])
         self.assertEqual(q1.transitions['c'], [q1])
         self.assertEqual(q2.transitions.keys(), ['f'])
         self.assertEqual(q2.transitions['f'], [q2])
-
 
     def test_archivo_automata__transicion_estado_invalido(self):
         input_text = 'q0\n'
@@ -141,7 +148,7 @@ class TestBuildOperandTree(TestCase):
         input_regex_tree = 'a'
 
         tree = build_operand_tree(StringIO(input_regex_tree))
-        
+
         self.assertTrue(isinstance(tree, Symbol))
         self.assertEqual('a', tree.content)
 
@@ -196,8 +203,8 @@ class TestBuildOperandTree(TestCase):
         self.assertTrue(isinstance(tree, Plus))
         self.assertTrue(isinstance(tree.content, Symbol))
         self.assertEqual('a', tree.content.content)
-    
-    def test_only_plus(self):
+
+    def test_only_opt(self):
         input_regex_tree = "{OPT}\n"
         input_regex_tree += "\ta\n"
 
@@ -206,7 +213,7 @@ class TestBuildOperandTree(TestCase):
         self.assertTrue(isinstance(tree, Opt))
         self.assertTrue(isinstance(tree.content, Symbol))
         self.assertEqual('a', tree.content.content)
-    
+
     def test_ejemplo_uno_enunciado(self):
         input_regex_tree = "{CONCAT}3\n"
         input_regex_tree += "\t{STAR}\n"
@@ -229,7 +236,7 @@ class TestBuildOperandTree(TestCase):
         self.assertTrue(isinstance(concat_content[0], Star))
         self.assertTrue(isinstance(concat_content[1], Plus))
         self.assertTrue(isinstance(concat_content[2], Symbol))
-        
+
         star_content = concat_content[0].content
         self.assertTrue(isinstance(star_content, Or))
 
@@ -253,7 +260,7 @@ class TestBuildOperandTree(TestCase):
         self.assertEqual('e', concat2_content[1].content)
 
         self.assertEqual('f', concat_content[2].content)
-    
+
     def test_ejemplo_dos_enunciado(self):
         input_regex_tree = "{CONCAT}3\n"
         input_regex_tree += "\t{OPT}\n"
@@ -278,7 +285,7 @@ class TestBuildOperandTree(TestCase):
         self.assertTrue(isinstance(concat_content[0], Opt))
         self.assertTrue(isinstance(concat_content[1], Plus))
         self.assertTrue(isinstance(concat_content[2], Star))
-        
+
         opt_content = concat_content[0].content
         self.assertTrue(isinstance(opt_content, Concat))
 
@@ -309,15 +316,15 @@ class TestBuildOperandTree(TestCase):
 
     def test__too_many_characters(self):
         input_regex_tree = '*s'
-        
+
         with self.assertRaises(ValueError):
-            tree = build_operand_tree(StringIO(input_regex_tree))
-    
+            build_operand_tree(StringIO(input_regex_tree))
+
     def test__invalid_characters(self):
         input_regex_tree = '*'
-        
+
         with self.assertRaises(ValueError):
-            tree = build_operand_tree(StringIO(input_regex_tree))
+            build_operand_tree(StringIO(input_regex_tree))
 
     def test__too_many_subexpressions_single_expected_eof(self):
         input_regex_tree = "{STAR}\n"
@@ -325,7 +332,7 @@ class TestBuildOperandTree(TestCase):
         input_regex_tree += "\tB\n"
 
         with self.assertRaises(Exception):
-            tree = build_operand_tree(StringIO(input_regex_tree))
+            build_operand_tree(StringIO(input_regex_tree))
 
     def test__too_many_subexpressions_than_expected_no_EOF(self):
         input_regex_tree = "{CONCAT}2\n"
@@ -335,14 +342,14 @@ class TestBuildOperandTree(TestCase):
         input_regex_tree += "\tC\n"
 
         with self.assertRaises(Exception):
-            tree = build_operand_tree(StringIO(input_regex_tree))
+            build_operand_tree(StringIO(input_regex_tree))
 
     def test__not_enough_subexpressions(self):
         input_regex_tree = "{CONCAT}1\n"
         input_regex_tree += "\tA\n"
 
         with self.assertRaises(Exception):
-            tree = build_operand_tree(StringIO(input_regex_tree))
+            build_operand_tree(StringIO(input_regex_tree))
 
     def test__less_subexpressions_than_expected_EOF(self):
         input_regex_tree = "{CONCAT}3\n"
@@ -350,7 +357,7 @@ class TestBuildOperandTree(TestCase):
         input_regex_tree += "\tB\n"
 
         with self.assertRaises(Exception):
-            tree = build_operand_tree(StringIO(input_regex_tree))
+            build_operand_tree(StringIO(input_regex_tree))
 
     def test__less_subexpressions_than_expected_no_EOF(self):
         input_regex_tree = "{CONCAT}2\n"
@@ -360,7 +367,8 @@ class TestBuildOperandTree(TestCase):
         input_regex_tree += "\tC\n"
 
         with self.assertRaises(Exception):
-            tree = build_operand_tree(StringIO(input_regex_tree))
+            build_operand_tree(StringIO(input_regex_tree))
+
 
 class TestRegexTreeToNFA(TestCase):
     def test_symbol_to_automata(self):
@@ -379,7 +387,7 @@ class TestRegexTreeToNFA(TestCase):
         self.assertEqual(['a'], tested.symbols)
         self.assertEqual(4, len(tested.states))
 
-        # FIXME: Mal testeo 
+        # FIXME: Mal testeo
         dfa_tested = nfa_to_dfa(tested)
         self.assertTrue(dfa_tested.accepts(""))
         self.assertTrue(dfa_tested.accepts("a"))
@@ -391,7 +399,7 @@ class TestRegexTreeToNFA(TestCase):
 
         tested = tree.to_automata()
         self.assertEqual(['a'], tested.symbols)
-        #self.assertEqual(4, len(tested.states))
+        # self.assertEqual(4, len(tested.states))
 
         # FIXME: Mal testeo
         dfa_tested = nfa_to_dfa(tested)
@@ -405,7 +413,7 @@ class TestRegexTreeToNFA(TestCase):
 
         tested = tree.to_automata()
         self.assertEqual(['a'], tested.symbols)
-        #self.assertEqual(4, len(tested.states))
+        # self.assertEqual(4, len(tested.states))
 
         # FIXME: Mal testeo
         dfa_tested = nfa_to_dfa(tested)
@@ -440,7 +448,7 @@ class TestRegexTreeToNFA(TestCase):
         self.assertEqual(['a', 'b'], tested.symbols)
 
 
-#class TestParseRegex(TestCase):
+# class TestParseRegex(TestCase):
 #
 #    def test_only_symbol(self):
 #        input_regex_tree = 'a'
