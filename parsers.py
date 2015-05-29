@@ -2,10 +2,11 @@
 
 import string
 from models import Automata, Node, LAMBDA
-from collections import defaultdict
+
 
 def is_valid_char(char):
     return char == '\\t' or char in string.letters + string.digits + '([,:;.¿?!¡()"\&-]' + "'"
+
 
 def parse_transition_line(transition_line, states):
     transition = transition_line.split('\t')
@@ -64,7 +65,7 @@ def load_automata(automata_file):
                 # No hay finales y es la primer transición!!
                 parse_transition_line(finals_line, states)
                 finals = []
-                break;
+                break
             else:
                 raise Exception('Formato invalido. Estado final {0} esta en la lista de estados validos {1}'.format(final_state_name, states))
         else:
@@ -77,12 +78,14 @@ def load_automata(automata_file):
 
     return Automata(states, symbols, initial, finals)
 
+
 class Tree():
     def __init__(self, content):
         self.content = content
 
     def to_automata(self):
         pass
+
 
 class Symbol(Tree):
     def __init__(self, content):
@@ -101,6 +104,7 @@ class Symbol(Tree):
         q0.add_transition(self.content, q1)
         return Automata([q0, q1], [self.content], q0, [q1])
 
+
 class Star(Tree):
     def __init__(self, content):
         if not isinstance(content, Tree):
@@ -112,7 +116,7 @@ class Star(Tree):
         content_automata = self.content.to_automata()
         q0 = Node()
         qf = Node()
-        
+
         q0.add_transition(LAMBDA, content_automata.initial)
         q0.add_transition(LAMBDA, qf)
 
@@ -121,6 +125,7 @@ class Star(Tree):
             q.add_transition(LAMBDA, content_automata.initial)
 
         return Automata([q0, qf] + content_automata.states, content_automata.symbols, q0, [qf])
+
 
 class Plus(Tree):
     def __init__(self, content):
@@ -131,6 +136,7 @@ class Plus(Tree):
 
     def to_automata(self):
         return Concat([self.content, Star(self.content)]).to_automata()
+
 
 class Opt(Tree):
     def __init__(self, content):
@@ -144,14 +150,15 @@ class Opt(Tree):
         q0 = Node()
         qf = Node()
         states = [q0, qf] + content_automata.states
-        
+
         q0.add_transition(LAMBDA, qf)
         q0.add_transition(LAMBDA, content_automata.initial)
         for q in content_automata.finals:
             q.add_transition(LAMBDA, qf)
 
         return Automata(states, content_automata.symbols, q0, [qf])
-        
+
+
 class Or(Tree):
     def __init__(self, content):
         if not isinstance(content, list):
@@ -183,6 +190,7 @@ class Or(Tree):
 
         return Automata(states, list(set(symbols)), q0, [qf])
 
+
 class Concat(Tree):
     def __init__(self, content):
         if not isinstance(content, list):
@@ -207,15 +215,17 @@ class Concat(Tree):
             symbols += content_automatas[i].symbols
             if i < len(content_automatas) - 1:
                 for final in content_automatas[i].finals:
-                    final.add_transition(LAMBDA, content_automatas[i+1].initial)
+                    final.add_transition(LAMBDA, content_automatas[i + 1].initial)
 
         return Automata(states, list(set(symbols)), content_automatas[0].initial, content_automatas[-1].finals)
+
 
 def build_operand_tree(tree_file):
     tree = build_operand_tree_with_depth(tree_file, 0)
     if tree_file.readline() != '':
         raise Exception("Cargué un árbol sin leer todo el archivo.")
     return tree
+
 
 def build_operand_tree_with_depth(tree_file, depth):
     line = tree_file.readline()
@@ -248,7 +258,7 @@ def build_operand_tree_with_depth(tree_file, depth):
     else:
         return Symbol(line.strip())
 
+
 def regex_to_automata(tree_file):
     operand_tree = build_operand_tree(tree_file)
     return operand_tree.to_automata()
-
