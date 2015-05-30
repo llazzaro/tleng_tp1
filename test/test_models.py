@@ -558,6 +558,32 @@ class TestMinimize(TestCase):
         self.assertTrue(minimized.initial.transition('1').transition('0') in minimized.finals)
         self.assertEquals(minimized.initial.transition('1').transition('1').transition('1'), minimized.initial)
 
+    def test_minimize__con_nodo_trampa(self):
+        q0 = Node('q0')
+        q1 = Node('q1')
+        qT = Node('qT')
+
+        q0.add_transition('0', q1)
+        q0.add_transition('0', qT)
+        q0.add_transition('1', qT)
+        q1.add_transition('0', qT)
+        q1.add_transition('0', qT)
+        qT.add_transition('0', qT)
+        qT.add_transition('1', qT)
+
+        automata = Automata([q0, q1, qT], ['0', '1'], q0, [q1])
+        minimized = minimize(automata)
+
+        self.assertEquals(set(minimized.symbols), set(automata.symbols))
+        self.assertEquals(len(minimized.states), 2)
+
+        q0 = minimized.state_by_name('q0')
+        q1 = minimized.state_by_name('q1')
+
+        self.assertEquals(q0.transition('0'), q1)
+        self.assertEquals(q0.transitions.keys(), ['0'])
+        self.assertEquals(q1.transitions.keys(), [])
+
 
 if __name__ == '__main__':
     unittest.main()
