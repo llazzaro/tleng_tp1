@@ -142,6 +142,24 @@ class TestParseAutomata(TestCase):
 
         self.assertEqual(q0.transitions.keys(), [])
 
+    def test_archivo_automata__sin_transiciones_ni_estado_final(self):
+        input_text = 'q0\n'
+        input_text += '\n'
+        input_text += 'q0\n'
+
+        file_input = StringIO(input_text)
+
+        automata = load_automata(file_input)
+
+        self.assertEqual(len(automata.states), 1)
+        self.assertEqual(automata.symbols, [])
+
+        q0 = automata.state_by_name("q0")
+
+        self.assertEqual(automata.initial, q0)
+
+        self.assertEqual(q0.transitions.keys(), [])
+
 
 class TestBuildOperandTree(TestCase):
     def test_only_symbol(self):

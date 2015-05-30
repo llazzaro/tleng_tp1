@@ -1,9 +1,8 @@
 import unittest
 from unittest import TestCase
-from StringIO import StringIO
 
-from ejercicio_b import pertenece_al_lenguaje
-from models import *
+from models import Node, Automata
+
 
 class TestEjercicioA(TestCase):
     def test_accept__ejemplo_enunciado(self):
@@ -11,7 +10,7 @@ class TestEjercicioA(TestCase):
         q1 = Node('q1')
         q2 = Node('q2')
         symbols = ['a', 'b', 'c', 'd', 'e', 'f']
-        
+
         q0.add_transition('a', q1)
         q1.add_transition('b', q2)
         q1.add_transition('c', q1)

@@ -44,7 +44,8 @@ def load_automata(automata_file):
     symbol_line = automata_file.readline()
     symbols = []
     for symbol in symbol_line.split('\t'):
-        symbols.append(symbol.strip('\n'))
+        if symbol.strip('\n') != '':
+            symbols.append(symbol.strip('\n'))
 
     initial_line = automata_file.readline()
     initial = None
@@ -60,7 +61,9 @@ def load_automata(automata_file):
     finals = []
     for final_state_name in finals_line.split('\t'):
         final_state_name = final_state_name.strip('\n')
-        if final_state_name not in valid_state_names:
+
+        if final_state_name != '' and final_state_name not in valid_state_names:
+            # reviso el caso '' por si no tiene transiciones, ni estados finales.
             if is_valid_char(final_state_name):
                 # No hay finales y es la primer transición!!
                 parse_transition_line(finals_line, states)
