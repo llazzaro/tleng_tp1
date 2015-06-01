@@ -199,7 +199,6 @@ def minimize(automata):
 
     previous_partition = None
     while current_partition != previous_partition:
-        # last_prev_partition = current_partition[automata.initial]  # comente la linea, no se usa
         previous_partition = current_partition.copy()
 
         process = {}
