@@ -409,7 +409,6 @@ class TestRegexTreeToNFA(TestCase):
         q0 = dfa_tested.state_by_name("q0")
         q1 = dfa_tested.state_by_name("q1")
 
-        q1 = dfa_tested.state_by_name("q1")
         self.assertEquals(dfa_tested.initial, q0)
         self.assertEquals(set([q1, q0]), set(dfa_tested.finals))
 
