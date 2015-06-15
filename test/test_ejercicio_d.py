@@ -1,13 +1,11 @@
 #!/usr/bin/python
-# -*- coding: utf-8 -*- 
+# -*- coding: utf-8 -*-
 
 import unittest
 from unittest import TestCase
-from StringIO import StringIO
 
-from parsers import load_automata
-from models import *
-from ejercicio_d import afd_interseccion, interseccion, IncompatibleAlphabetsError, NonDeterministicAutomataError
+from models import Node, Automata
+from ejercicio_d import afd_interseccion, NonDeterministicAutomataError
 
 
 class TestEjercicioD(TestCase):
@@ -33,7 +31,6 @@ class TestEjercicioD(TestCase):
         self.assertEqual(qII, qI.transition('1'))
         self.assertEqual(qI, qII.transition('0'))
 
-
     def test_interseccion_vacia(self):
         q0 = Node("q0")
         q1 = Node("q1")
@@ -54,7 +51,6 @@ class TestEjercicioD(TestCase):
         self.assertEqual(set(automata1.symbols), set(interseccion.symbols))
         self.assertEqual(0, len(interseccion.states))
 
-    
     def test_interseccion_010(self):
         q0_e = Node("q0")
         q1_e = Node("q1")
@@ -82,7 +78,7 @@ class TestEjercicioD(TestCase):
         automata_empieza_010 = Automata([q0_e, q1_e, q2_e, q3_e], ['0', '1'], q0_e, [q3_e])
         automata_termina_010 = Automata([q0_t, q1_t, q2_t, q3_t], ['0', '1'], q0_t, [q3_t])
 
-        automata_empieza_termina_010  = afd_interseccion(automata_empieza_010, automata_termina_010)
+        automata_empieza_termina_010 = afd_interseccion(automata_empieza_010, automata_termina_010)
 
         self.assertEqual(set(automata_empieza_010.symbols), set(automata_empieza_termina_010.symbols))
         self.assertEqual(7, len(automata_empieza_termina_010.states))
@@ -175,7 +171,6 @@ class TestEjercicioD(TestCase):
         with self.assertRaises(KeyError):
             q1.transition('a')
 
-
     def test_no_determinismo(self):
         q0_1 = Node("q0")
         q1_1 = Node("q1")
@@ -197,7 +192,6 @@ class TestEjercicioD(TestCase):
 
         with self.assertRaises(NonDeterministicAutomataError):
             afd_interseccion(automata1, automata2)
-
 
 
 if __name__ == '__main__':
