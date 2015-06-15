@@ -193,6 +193,28 @@ class TestEjercicioD(TestCase):
         with self.assertRaises(NonDeterministicAutomataError):
             afd_interseccion(automata1, automata2)
 
+    def test_correccion(self):
+        """
+            agrego el test que nos dieron como ejemplo en el informe
+        """
+        q0 = Node("q0")
+        q1 = Node("q1")
+        q0.add_transition('a', q1)
+        q0.add_transition('b', q1)
+        automata1 = Automata([q0, q1], ['a', 'b'], q0, [q1])
+
+        q2 = Node("q2")
+        q3 = Node("q3")
+        q2.add_transition('a', q3)
+        q2.add_transition('c', q3)
+        automata2 = Automata([q2, q3], ['a', 'c'], q2, [q3])
+
+        res = afd_interseccion(automata1, automata2)
+
+        self.assertEquals(len(res.states), 2)
+        self.assertEquals(len(res.finals), 1)
+        self.assertEquals(res.initial.transitions.keys(), ['a'])
+        self.assertEquals(res.initial.transition('a'), res.finals[0])
 
 if __name__ == '__main__':
     unittest.main()
