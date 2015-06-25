@@ -294,6 +294,24 @@ class TestAutomata(TestCase):
         self.assertTrue(automata.is_lambda_deterministic())
         self.assertTrue(automata.has_lambda())
 
+    def test_automata_with_no_transitions(self):
+        initial = Node()
+        final = Node()
+        automata = Automata([initial, final], ['a'], initial, [final])
+        
+        #assert para que haya alguno, la idea es que si no tendría que tirar excepción.
+        self.assertTrue(automata.initial == initial)
+        
+
+    def test_automata_without_final_states(self):
+        initial = Node()
+        final = Node()
+        initial.add_transition('a', final)
+        automata = Automata([initial, final], ['a'], initial, [])
+
+        #assert para que haya alguno, la idea es que si no tendría que tirar excepción.
+        self.assertTrue(automata.initial == initial)
+
     def test_get_by_name__existing(self):
         q0 = Node("q0")
 
