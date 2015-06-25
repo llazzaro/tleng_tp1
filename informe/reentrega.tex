@@ -1,0 +1,33 @@
+
+\section{Reentrega}
+
+Para le re-entrega se decidio mejorar el codigo en general.
+
+\section*{Parser de RegEx}
+
+Para parsear las expresiones regulares, se arma un \'arbol donde cada nodo corresponde a un a un operador o s\'imbolo.
+
+Este arbol se arma recurvisamente mientras se lee la entrada.
+
+Cada operador o simbolo tiene si propia clase y esta clase
+implementa la conversion a un automata.
+La forma de convertir el automata sigue conservando la idea de la entrega original, salvo que ahora cada Nodo encapsula esta conversion en el metodo "to_automata".
+
+\section{Transiciones LAMBDA}
+
+Para el problema de las transiciones LAMBDA, la clase automata implementa correctamente el metodo "is_deterministic" considerando el caso cuando hay una transicion LAMBDA.
+Ademas, en los simbolos del automata no permitimos la existencia del LAMBDA. 
+
+
+El algoritmo de minimizacion fue re-implmentado completamente y como entrada require un automata deterministico.
+Ademas, este nuevo algoritmo nunca considera que se pueden tener transiciones LAMBDA.
+
+\section{Ejercicio interseccion de automatas}
+
+Se adapto el algoritmo para aceptar automatas con distinto conjuntos de simbolos.
+
+\section{Correciones Menores}
+
+Se aceptan automatas sin transiciones.
+Se aceptan automatas sin estados finales
+Se aceptan automatas sin estados finales, ni transiciones.
