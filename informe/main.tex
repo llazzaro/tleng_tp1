@@ -2,7 +2,6 @@
 \usepackage[utf8]{inputenc}
 
 \title{Informe TL}
-\author{lazzaroleonardo}
 \date{April 2015}
 
 \usepackage{natbib}
@@ -22,12 +21,12 @@
 
 \materia{Teor\'ia de Lenguajes}
 \submateria{Primer Cuatrimestre de 2015}
-\titulo{Trabajo Práctico 1}
+\titulo{Recuperatorio Trabajo Práctico 1}
 
 \grupo{Grupo Estado Final}
-\integrante{Montero, Victor}{707/98}{vmontero@dc.uba.ar}
-\integrante{Román Gorojovsky}{530/02}{rgorojovsky@gmail.com}
+\integrante{Gorojovsky, Román}{530/02}{rgorojovsky@gmail.com}
 \integrante{Lazzaro, Leonardo}{147/05}{lazzaroleonardo@gmail.com}
+\integrante{Montero, Victor}{707/98}{vmontero@dc.uba.ar}
 
 \begin{titlepage}
 \maketitle
@@ -40,7 +39,7 @@
 %				FIN DE CARÁTULA			%
 %%%%%%%%%%%%%%%%%%%%%%%%%%%
 
-\include{reentrega}
+%\include{reentrega}
 
 \section*{Organización general del código.}
 El trabajo se realizó en \emph{Python}.  Se crearon tres módulos: \texttt{models} contiene la representación del autómata (clases \texttt{Automata} y \texttt{Node}), \texttt{parsers}  contiene funciones para leer los archivos según los formatos definidos (regex y autómata) y convertirlos en objetos de clase \texttt{Automata}, y \texttt{writers} contiene funciones que escriben objetos de dicha clase en formato de texto o \texttt{DOT}.  
@@ -48,85 +47,57 @@ El trabajo se realizó en \emph{Python}.  Se crearon tres módulos: \texttt{mode
 Usando estas clases, se resolvieron los ejercicios en los archivos correspondientes, según el esqueleto provisto por la cátedra.  Para cada ejercicio se implemento un breve unit test en \texttt{test/test\_ejercicio\_x}.  También se implementaron unit tests para \texttt{models} y \texttt{parsers}.  En algunos casos hay también un script \texttt{run\_and\_plot\_ejercicio\_x} que ejecuta el ejercicio y presenta gráficamente el resultado.
 
 \section*{Clase \texttt{Automata}}
-La clase \texttt{Automata} contiene el estado inicial, la lista de estados, los símbolos y el conjunto de finales.  Los estados están representados por la clase \texttt{Nodo}, y contienen un nombre y un diccionario cuyas claves son los símbolos y el valor un conjunto de estados a los que se puede transitar consumiendo ese símbolo.  Claramente un nodo puede carecer de transiciones para un o más símbolo del lenguaje.
+La clase \texttt{Automata} contiene la lista de estados, los símbolos, el estado inicial y el
+conjunto de finales.  Además tiene algunas funciones necesarias para resolver algunos de los
+ejercicios, que se discutirán oportunamente.
 
-El autómata se puede crear pasando todos los elementos al constructor, o bien tan solo con el estado inicial y con una lista de estados finales, lo que nos permite mergear facilmente dos autómatas (por ejemplo solo juntando los finales con el inicial).
+Para esta reentrega se corrigió el m\'etodo \texttt{is\_deterministic()} para que rechace autómatas
+con transiciones lambda.  Tambin se eliminaron las excepciones que impedían la construcción de
+autómatas sin transiciones o sin estados finales.
 
-La clase \texttt{Automata} brinda también algunas funciones necesarias para resolver algunos de los ejercicios, que se discutirán oportunamente.
-
-\section*{Parser de RegEx}
-
-Para parsear las expresiones regulares, se arma un diccionario donde la clave es la altura del árbol y el valor una lista de tuplas de la forma $\langle OPERADOR, VALOR \rangle$, donde $OPERADOR$ puede ser:
-\begin{itemize}
-\item $\{CONCAT\}$
-\item $\{STAR\}$
-\item $\{OR\}$
-\item $\{PLUS\}$
-\item $\{OPT\}$ 
-\item $\{SYMBOL\}$
-\end{itemize}
-
-\noindent 
-y $VALOR$ puede ser la cantidad de operandos o el símbolo para el caso $\{SYMBOL\}$.
-
-
-La altura del árbol la define la cantidad de tabs, y en el caso de que el tab es un símbolo en la segunda pasada del parser lo tratamos como un caso especial.  Una vez obtenida esta estructura, la recorremos para armar autómatas que luego se van mergeando segun el algoritmo del ejercicio a (ver sección siguiente).  No implementamos el algoritmo de mergeo, ya que pensamos a los estados como nodos y para juntar autómatas solo agregamos enlaces entre estos.
-
+Los estados están representados por la clase \texttt{Nodo}, y contienen un nombre y un diccionario
+cuyas claves son los símbolos y el valor una lista de estados a los que se puede transitar
+consumiendo ese símbolo.  Obviamente un nodo puede carecer de transiciones para un o más símbolo del
+lenguaje.
 
 \section*{Ejercicio a: Minimizar autómatas}
+\subsection*{Expresiones regulares}
 
-Para diseñar el algortimo que construye el autómata apartir de la expresión regular nos basamos en el teorema 3.7 del \Hopcroft, que demuestra inductivamente que todo lenguaje definido por una expresión regular, está definido también por un autómata finito.  Nuestro algortimo considera cada caso del la demostración y funciona recursivamente, tomando como los casos bases los correspondientes a la inducción. 
+Para leer las expresiones regulares y luego convertirlas en autómatas, se parsea el
+archivo creando un objeto \texttt{Tree} o, más precisamente, un objeto de alguna clase que hereda de
+\texttt{Tree}, todos definidos en \texttt{parsers.py}.  Cada uno de estas clases representan un tipo
+de operador de la expresión regular ($Concat$, $Star$, $Or$, $Plus$, $Opt$, y $Symbol$) y tienen un
+m\'etodo \texttt{to\_automata()} que devuelve el objeto autómata correspondiente, siguiendo el
+teorema presentado en \Hopcroft, (pág. 102 y siguientes, teorema 3.7).  Los dos casos que no están
+en el libro, $Plus$ y $Opt$, se resolvieron mediante los reemplazos $a^{+} = aa^{*}$ y $a? = a|\lambda$
 
+Este algoritmo crea un autómata no determinístico, que hay que determinizar y luego minimizar.  Para
+esto se usaron los dos algoritmos vistos en clase, el primero definido en \texttt{ejercicio\_a.py}
+(la función \texttt{nfa\_to\_dfa()}) y el segundo como m\'etodo del autómata (\texttt{minimize()}).
 
-Este algortimo nos devuelve un AFND-$\lambda$.  Para pasar este autómata a AFD, utilizamos la idea que sugiere Hopcroft en la pagina 150: implementamos la función \texttt{lambda\_closure}, la cual calcula, obviamente, la clausura lambda.  Esto nos permite calcular la función delta del AFD que queremos obtener como resultado y, para obtener dado un conjunto de estados todos los estados alcazables usamos la función \texttt{move\_set()}.
-
-\subsubsection*{Pseudocodigo de algoritmo para convertir de AFND a AFD}
-
-\begin{verbatim}
-def AFND_to_AFD(automata):
-    clausura_inicial = lambda_closure(automata.initial)
-    AFD_initial = DameNodo(clausura_inicial)
-    states_queue = Queue()
-    states_queue.put(AFD_initial)
-    
-    # aca construimos el nuevo delta
-    mientras la queue no esta vacia:
-        AFD_state = states_queue.get()
-        for symbol in automata.symbols():
-            current_state_closure=lambda_closure(automata.move_set(AFD_state.AFND_states, symbol))
-
-            new_AFD_state=DameNodo(current_state_closure)
-            
-            AFD_state.add_transition(symbol, new_AFD_state)
-
-    marcar_los_estados_finales()
-
-    return res
-\end{verbatim}
-
-\pagebreak
-Donde:
-\begin{itemize}
-\item Un nuevo nodo del AFD esta asociado a uno o mas nodos del AFND.
-\item \texttt{DameNodo()} se le pasa un conjunto de estados de la AFND y busca/crea el estado de la AFD que estamos creando, según corresponda.  En la práctica, no implementamos este método en el código, pero aquí simplifica.
-\item \texttt{marcar\_los\_estados\_finales()} revisa si todos los nuevos estados creados para la AFD estan asociados a algun nodo de la AFND que era final y si lo era lo marca como final.
-\end{itemize}
-
-Para minimizar usamos el algortimo que se dio en la clase práctica. En cuanto a tests, usamos los ejemplos del libro, el del enunciado del trabajo y uno un poco más largo hallado en wikipedia.
-% Habría que poner el seudocódigo de eso acá también.
-
-
+En cuanto a tests, usamos los ejemplos del libro, el del enunciado del trabajo y uno un poco más
+largo hallado en wikipedia.
 
 \section*{Ejercicio b: Decidir si una cadena pertenece al lenguaje de un autómata}
-La solucion a este ejercicio usa una de los métodos de la clase \texttt{Automata}, \texttt{move\_sequence()}, que dada una cadena intenta ``aplicarle'' el autómata y devuelve un booleano indicando si fue se llegó a un estado final o no.  Según este resultado se escribe \texttt{TRUE} o \texttt{FALSE}, según se pide en el enunciado.  Para testearlo usamos el autómata que correspondería a la expresión regular \texttt{ac*(bf*)?}.
+La solucion a este ejercicio usa una de los métodos de la clase \texttt{Automata},
+\texttt{move\_sequence()}, que dada una cadena intenta ``aplicarle'' el autómata y devuelve un
+booleano indicando si fue se llegó a un estado final o no.  Según este resultado se escribe
+\texttt{TRUE} o \texttt{FALSE}, según se pide en el enunciado.  Para testearlo usamos el autómata
+que correspondería a la expresión regular \texttt{ac*(bf*)?}.
 
 \section*{Ejercicio c: Escribir un autómata en formato \texttt{.dot}}
-Para la solucion de este ejercicio tampoco hay demasiada magia.  Implementamos una función \texttt{save\_dot()} en \texttt{writers} que toma un \texttt{Automata} y escribel el \texttt{.dot} correspondiente, y un módico test con un autómata sencillo, verificando el contenido archivo que se generaría. 
+Para la solucion de este ejercicio tampoco hay demasiada magia.  Implementamos una función
+\texttt{save\_dot()} en \texttt{writers} que toma un \texttt{Automata} y escribel el \texttt{.dot}
+correspondiente, y un módico test con un autómata sencillo, verificando el contenido archivo que se
+generaría.
 
 \section*{Ejercicio d: Intersección de autómatas}
-El cálculo de la intersección fue el ejercicio que, innecesariamente, más dificultad nos causó, debido a que se trabajó primero con una definición errónea y luego con un ejemplo mal interpretado.  
+El cálculo de la intersección fue el ejercicio que, innecesariamente, más dificultad nos causó,
+debido a que se trabajó primero con una definición errónea y luego con un ejemplo mal interpretado.
 
-En un principio, dados dos autómatas $M_1 = \langle Q_1, \Sigma, q^1_0, \delta_1, F_1 \rangle $ y $M_2 = \langle Q_2, \Sigma, q^2_0, \delta_2, F_2 \rangle$ (ambos con el mismo alfabeto), definíamos la intersección $M_I$ como: 
+En un principio, dados dos autómatas $M_1 = \langle Q_1, \Sigma, q^1_0, \delta_1, F_1 \rangle $ y
+$M_2 = \langle Q_2, \Sigma, q^2_0, \delta_2, F_2 \rangle$ (ambos con el mismo alfabeto), definíamos
+la intersección $M_I$ como:
 
 
 $$
@@ -142,7 +113,9 @@ $$
 
 $\\$
 
-Esta definición genera muchos estados inútiles, es decir, inalcanzables partiendo del inicial consumiendo la misma cadena en los dos autómatas, por así decirlo.  Por ejemplo, si tenemos el siguiente autómata:
+Esta definición genera muchos estados inútiles, es decir, inalcanzables partiendo del inicial
+consumiendo la misma cadena en los dos autómatas, por así decirlo.  Por ejemplo, si tenemos el
+siguiente autómata:
 
 \begin{figure}[h!]
   \centering
@@ -151,7 +124,9 @@ Esta definición genera muchos estados inútiles, es decir, inalcanzables partie
 \end{figure}
 
 \noindent 
-y queremos calcular su intersección con si mismo, se va a generar un estado $(q^1_0, q^2_1)$ que correspondería a ``el primer autómata está en el estado 0 y el segundo en el estado 1'', cosa que nunca puede ocurrir.
+y queremos calcular su intersección con si mismo, se va a generar un estado $(q^1_0, q^2_1)$ que
+correspondería a ``el primer autómata está en el estado 0 y el segundo en el estado 1'', cosa que
+nunca puede ocurrir.
 
 Para corregir esto, la definición del conjunto de estados en la intersección pasó a ser
 
@@ -159,10 +134,22 @@ $$
 \{(q^1_i, q^2_j) / (q^1_i, q^2_j) \in Q_1 \times Q_2 \wedge \exists \alpha \in \Sigma^* / \delta_1^*(q^1_0, \alpha) = q^1_i \wedge  \delta_2^*(q^2_0, \alpha) = q^2_j \}
 $$
 
-Dicho esto, la implementación más sencilla es construír la primer versión y luego eliminar los nodos sobrantes, es decir, aquellos a los que no se llega partiendo del nodo inicial.  En el ejemplo, los únicos nodos que quedarían son $(q^1_0, q^2_0)$ y $(q^1_1, q^2_1)$.  Al resultado de esta construcción se le aplicó la minimización desarrollada en el ejercicio a.
+Dicho esto, la implementación más sencilla es construír la primer versión y luego eliminar los nodos
+sobrantes, es decir, aquellos a los que no se llega partiendo del nodo inicial.  En el ejemplo, los
+únicos nodos que quedarían son $(q^1_0, q^2_0)$ y $(q^1_1, q^2_1)$.  Al resultado de esta
+construcción se le aplicó la minimización desarrollada en el ejercicio a.
 
-La otra dificultad, como mencionamos, fue un ejemplo mal interpretado.  La intersección entre ``las cadenas que empiezan con 010'' y ``las cadenas que terminan con 010'' no es ``la cadena \texttt{'010'}'' sino ``las cadenas que empiezan y terminan con 010'', y sin embargo eso fue lo que intentamos obtener como salida del algoritmo durante varias horas.  Una vez resuelto el problema mental, quedó este ejemplo como uno de los tests, junto al caso evidente de la intersección de un autómata con si mismo que, efectivamente, genera el mismo autómata (usando el autómata del ejemplo) y la de dos autómatas cuya intersección es vacía, o mejor dicho dos autómatas que aceptan lenguajes cuya intersección es vacía.
+La otra dificultad, como mencionamos, fue un ejemplo mal interpretado.  La intersección entre ``las
+cadenas que empiezan con 010'' y ``las cadenas que terminan con 010'' no es ``la cadena
+\texttt{'010'}'' sino ``las cadenas que empiezan y terminan con 010'', y sin embargo eso fue lo que
+intentamos obtener como salida del algoritmo durante varias horas.  Una vez resuelto el problema
+mental, quedó este ejemplo como uno de los tests, junto al caso evidente de la intersección de un
+autómata con si mismo que, efectivamente, genera el mismo autómata (usando el autómata del ejemplo)
+y la de dos autómatas cuya intersección es vacía, o mejor dicho dos autómatas que aceptan lenguajes
+cuya intersección es vacía.
 
+Para esta reentrega se eliminó la excepción que impedía que se calculara la intersección de dos
+autómatas con alfabetos distintos.
 \section*{Ejercicio e: Complemento de un autómata}
 El complemento de dos autómatas es más sencillo de definir: Dado $M = \langle Q, \Sigma, q0, \delta, F \rangle$, con su estado trampa $qT$, el complemento es $M^c = \langle Q, \Sigma, q0, \delta, Q - F \rangle$, y el código simplemente hace eso: define un nuevo autómata.  Apenas tiene un test sencillo.
 
